@@ -1,7 +1,7 @@
 --------------------------------
 -- Fractional Brownian Motion --
 --------------------------------
-local cpuORgpu, pixelcode, shader = false, [[
+local cpuORgpu,pixelcode,shader,texture = false,[[
 	uniform float scale;
 	uniform float persistence;
 	uniform float octaves;
@@ -41,7 +41,7 @@ local cpuORgpu, pixelcode, shader = false, [[
 		float normalization = 0.0;
 		float total = 0.0;
 		for (int o = 0; o < octaves; o+=1) {
-			total += (snoise(vec2(screen_coords / scale * frequency)) * 0.5 + 0.5) * amplitude;
+			total += (snoise(vec2(texture_coords / scale * frequency)) * 0.5 + 0.5) * amplitude;
 			normalization += amplitude;
 			amplitude *= G;
 			frequency *= lacunarity;
@@ -71,14 +71,14 @@ end
 ----------------------
 -- Configuration UX --
 ----------------------
-local config, texts = {
-	scale = 66.6,
-	persistence = 5.55,
-	octaves = 3,
-	lacunarity = 2.22,
-	exponentiation = 1.33,
-	height = 1.33
-}, {}
+local config,texts = {
+	scale = 0.11,
+	persistence = -2.22,
+	octaves = 4,
+	lacunarity = 0.88,
+	exponentiation = 2.22,
+	height = 2.22
+},{}
 function visit(f, fa)
 	height = love.graphics.getFont():getHeight()
 	local accum = 0
@@ -131,6 +131,8 @@ function love.load(args, unfilteredArgs)
         table.insert(texts, {k, love.graphics.newText(font, k..":\t"..v)})
         shader:send(k,v)
     end
+    local w,h = love.graphics.getDimensions()
+    texture = love.graphics.newCanvas(w, h)
 end
 local image,data
 function love.update(dt)
@@ -145,15 +147,17 @@ function love.update(dt)
 		image = love.graphics.newImage(data)
 	end
 end
-local width,height,alpha = 0,0,0.88
+local width,height,alpha = 0,0,0.88 --TODO
 function love.draw()
 	local w,h = love.graphics.getDimensions()
-	if cpuORgpu then
-		love.graphics.draw(image)
+	if cpuORgpu then love.graphics.draw(image)
 	else
-		love.graphics.setShader(shader)
+		love.graphics.setCanvas(texture)
 		love.graphics.setColor(1,1,1,1)
 		love.graphics.rectangle("fill",0,0,w,h)
+		love.graphics.setCanvas()
+		love.graphics.setShader(shader)
+		love.graphics.draw(texture)
 		love.graphics.setShader()
 	end
 	love.graphics.setColor(0,0,0,alpha)
