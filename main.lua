@@ -1,7 +1,8 @@
+local w,h = love.graphics.getDimensions()
 --------------------------------
 -- Fractional Brownian Motion --
 --------------------------------
-local cpuORgpu,pixelcode,shader,texture = false,[[
+local cpuORgpu,pixelcode,shader,texture,screen = false,[[
 	uniform float scale;
 	uniform float persistence;
 	uniform float octaves;
@@ -53,37 +54,37 @@ local cpuORgpu,pixelcode,shader,texture = false,[[
 	}
 ]]
 function computeFBM(x, y)
-	local xs = x / config.scale
-	local ys = y / config.scale
-	local G = math.pow(2.0, -config.persistence)
+	local xs = x / config.sends.scale
+	local ys = y / config.sends.scale
+	local G = math.pow(2.0, -config.sends.persistence)
 	local amplitude, frequency, normalization, total = 1.0, 1.0, 0.0, 0.0
-	for i=1,config.octaves do
+	for i=1,config.sends.octaves do
 		local value = love.math.noise(xs * frequency, ys * frequency) * 0.5 + 0.5
 		total = total + value * amplitude
 		normalization = normalization + amplitude
 		amplitude = amplitude * G
-		frequency = frequency * config.lacunarity
+		frequency = frequency * config.sends.lacunarity
 	end
 	total = total / normalization
-	return math.pow(total, config.exponentiation) * config.height
+	return math.pow(total, config.sends.exponentiation) * config.sends.height
 end
 
 ----------------------
 -- Configuration UX --
 ----------------------
-local config,texts = {
+local config = {w=0,h=0,a=0.88,scale=math.min(w,h)/math.max(w,h)*32,gui={},sends={
 	scale = 0.11,
 	persistence = -2.22,
 	octaves = 4,
 	lacunarity = 0.88,
 	exponentiation = 2.22,
 	height = 2.22
-},{}
+}}
 function visit(f, fa)
 	height = love.graphics.getFont():getHeight()
 	local accum = 0
-	for i,v in ipairs(texts) do
-		local text = texts[i]
+	for i,v in ipairs(config.gui) do
+		local text = config.gui[i]
 		f(text,height)
 		if fa then accum = fa(text,accum) end
 		height = height + text[2]:getHeight()
@@ -114,9 +115,9 @@ function love.mousemoved(x, y, dx, dy, istouch)
 	if mouse.adjusting then
 		local key = mouse.adjusting[1]
 		local text = mouse.adjusting[2]
-		config[key] = config[key] + dx*0.01
-		text:set(key..":\t"..config[key])
-		if not cpuORgpu and shader then shader:send(key,config[key]) end
+		config.sends[key] = config.sends[key] + dx*0.01
+		text:set(key..":\t"..config.sends[key])
+		if not cpuORgpu and shader then shader:send(key,config.sends[key]) end
 	end
 end
 
@@ -124,21 +125,21 @@ end
 -- Load|Update|Draw --
 ----------------------
 function love.load(args, unfilteredArgs) 
+	love.graphics.setDefaultFilter("nearest","nearest")
     love.graphics.setNewFont(32)
     local font = love.graphics.getFont()
     shader = love.graphics.newShader(pixelcode)
-    for k,v in pairs(config) do
-        table.insert(texts, {k, love.graphics.newText(font, k..":\t"..v)})
+    for k,v in pairs(config.sends) do
+        table.insert(config.gui, {k, love.graphics.newText(font, k..":\t"..v)})
         shader:send(k,v)
     end
-    local w,h = love.graphics.getDimensions()
-    texture = love.graphics.newCanvas(w, h)
+    texture = love.graphics.newCanvas(w/config.scale, h/config.scale)
+    screen = love.graphics.newCanvas(w/config.scale, h/config.scale)
 end
 local image,data
 function love.update(dt)
     if cpuORgpu then 
-		local w,h = love.graphics.getDimensions()
-		data = love.image.newImageData(w, h)
+		data = love.image.newImageData(w/config.scale,h/config.scale)
 		for y=0,h-1 do
 			for x=0,w-1 do
 				data:setPixel(x, y, 1, 1, 1, computeFBM(x,y))
@@ -147,21 +148,22 @@ function love.update(dt)
 		image = love.graphics.newImage(data)
 	end
 end
-local width,height,alpha = 0,0,0.88 --TODO
 function love.draw()
-	local w,h = love.graphics.getDimensions()
-	if cpuORgpu then love.graphics.draw(image)
+	if cpuORgpu then love.graphics.draw(image,0,0,0,config.scale,config.scale)
 	else
 		love.graphics.setCanvas(texture)
 		love.graphics.setColor(1,1,1,1)
-		love.graphics.rectangle("fill",0,0,w,h)
-		love.graphics.setCanvas()
+		love.graphics.rectangle("fill",0,0,w/config.scale,h/config.scale)
+		love.graphics.setCanvas(screen)
 		love.graphics.setShader(shader)
+		love.graphics.clear()
 		love.graphics.draw(texture)
 		love.graphics.setShader()
+		love.graphics.setCanvas()
+		love.graphics.draw(screen,0,0,0,config.scale,config.scale)
 	end
 	love.graphics.setColor(0,0,0,alpha)
-	love.graphics.rectangle("fill",0,0,width,height)
+	love.graphics.rectangle("fill",0,0,config.w,config.h)
 	local fps = love.timer.getFPS()
 	if fps<99 then love.graphics.setColor(0.11,0.99,0.11,alpha) end
 	if fps<60 then love.graphics.setColor(0.99,0.99,0.11,alpha) end
@@ -174,6 +176,6 @@ function love.draw()
 		love.graphics.draw(text[2],0,height) 
 	end
 	local fa = function(text,accum) return math.max(accum,text[2]:getWidth()) end
-	height,width = visit(f, fa)
+	config.h,config.w = visit(f, fa)
 	love.graphics.setColor(1,1,1,1)
 end
