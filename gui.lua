@@ -1,13 +1,13 @@
 local w,h = love.graphics.getDimensions()
 
-config = {w=0,h=0,a=0.88,scale=math.min(w,h)/math.max(w,h)*32,gui={},sends={
+config = {w=0,h=0,a=0.88,gui={},sends={
 	scale = 0.11,
 	persistence = -2.22,
 	octaves = 4,
 	lacunarity = 0.88,
 	exponentiation = 2.22,
 	height = 2.22
-}}
+},scale=math.min(w,h)/math.max(w,h)*8}
 function visit(f, fa)
 	height = love.graphics.getFont():getHeight()
 	local accum = 0

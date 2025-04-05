@@ -1,4 +1,4 @@
-cpuORgpu,pixelcode,shader,texture,screen = false,[[
+cpuORgpu,fbmglsl,shader = false,[[
 	uniform float scale;
 	uniform float persistence;
 	uniform float octaves;
