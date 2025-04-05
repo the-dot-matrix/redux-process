@@ -15,16 +15,16 @@ function love.load(args, unfilteredArgs)
         table.insert(config.gui, {k, love.graphics.newText(font, k..":\t"..v)})
         shader:send(k,v)
     end
-    fbm = love.graphics.newCanvas(w/config.scale, h/config.scale)
-    dithered = love.graphics.newCanvas(w/config.scale, h/config.scale)
-    screen = love.graphics.newCanvas(w/config.scale, h/config.scale)
+    fbm = love.graphics.newCanvas(config.tilex,config.tiley)
+    dithered = love.graphics.newCanvas(config.tilex+config.border,config.tiley+config.border)
+    screen = love.graphics.newCanvas(config.tilex+config.border,config.tiley+config.border)
 end
 
 function love.update(dt)
     if cpuORgpu then 
-		data = love.image.newImageData(w/config.scale,h/config.scale)
-		for y=0,h/config.scale-1 do
-			for x=0,w/config.scale-1 do
+		data = love.image.newImageData(config.tilex,config.tiley)
+		for y=0,h/config.tilepx-1 do
+			for x=0,w/config.tilepx-1 do
 				data:setPixel(x, y, 1, 1, 1, computeFBM(x,y))
 			end
 		end
@@ -33,16 +33,16 @@ function love.update(dt)
 end
 
 function love.draw()
-	if cpuORgpu then love.graphics.draw(image,0,0,0,config.scale,config.scale)
+	if cpuORgpu then love.graphics.draw(image,0,0,0,config.tilepx,config.tilepx)
 	else
 		love.graphics.setCanvas(fbm)
 		love.graphics.setColor(1,1,1,1)
-		love.graphics.rectangle("fill",0,0,w/config.scale,h/config.scale)
+		love.graphics.rectangle("fill",0,0,config.tilex,config.tiley)
 		
 		love.graphics.setCanvas(dithered)
 		love.graphics.clear()
 		love.graphics.setShader(shader)
-		love.graphics.draw(fbm)
+		love.graphics.draw(fbm,config.border/2,config.border/2)
 		
 		love.graphics.setCanvas(screen)
 		love.graphics.clear()
@@ -50,9 +50,9 @@ function love.draw()
 		love.graphics.draw(dithered)
 		
 		love.graphics.setCanvas()
-		love.graphics.clear()
 		love.graphics.setShader()
-		love.graphics.draw(screen,0,0,0,config.scale,config.scale)
+		love.graphics.clear(0.25,0.25,0.25,1)
+		love.graphics.draw(screen,(w-screen:getWidth()*config.tilepx)/2,(h-screen:getHeight()*config.tilepx)/2,0,config.tilepx,config.tilepx)
 	end
 	love.graphics.setColor(0,0,0,config.a)
 	love.graphics.rectangle("fill",0,0,config.w,config.h)

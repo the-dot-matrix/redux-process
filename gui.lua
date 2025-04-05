@@ -4,12 +4,12 @@ config = {w=0,h=0,a=0.88,gui={},sends={
 	offsetx = love.math.random(-999,999),
 	offsety = love.math.random(-999,999),
 	scale = 0.25,
-	persistence = 0.5,
+	persistence = 0,
 	octaves = 1,
 	lacunarity = 1,
 	exponentiation = 2,
 	height = 1
-},scale=math.min(w,h)/math.max(w,h)*8}
+},tilepx=16,tilex=64,tiley=48,border=16}
 function visit(f, fa)
 	height = love.graphics.getFont():getHeight()
 	local accum = 0
