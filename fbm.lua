@@ -1,4 +1,6 @@
 cpuORgpu,fbmglsl,shader = false,[[
+	uniform float offsetx;
+	uniform float offsety;
 	uniform float scale;
 	uniform float persistence;
 	uniform float octaves;
@@ -38,7 +40,7 @@ cpuORgpu,fbmglsl,shader = false,[[
 		float normalization = 0.0;
 		float total = 0.0;
 		for (int o = 0; o < octaves; o+=1) {
-			total += (snoise(vec2(texture_coords / scale * frequency)) * 0.5 + 0.5) * amplitude;
+			total += (snoise(vec2((texture_coords+vec2(offsetx,offsety)) / scale * frequency)) * 0.5 + 0.5) * amplitude;
 			normalization += amplitude;
 			amplitude *= G;
 			frequency *= lacunarity;

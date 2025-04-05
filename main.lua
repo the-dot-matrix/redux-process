@@ -4,6 +4,8 @@ local w,h = love.graphics.getDimensions()
 local image,data
 
 function love.load(args, unfilteredArgs) 
+	w,h=love.window.getDesktopDimensions()
+	love.window.setMode(w,h)
 	love.graphics.setDefaultFilter("nearest","nearest")
     love.graphics.setNewFont(32)
     local font = love.graphics.getFont()

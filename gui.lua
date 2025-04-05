@@ -1,12 +1,14 @@
 local w,h = love.graphics.getDimensions()
 
 config = {w=0,h=0,a=0.88,gui={},sends={
-	scale = 0.11,
-	persistence = -2.22,
+	offsetx = love.math.random(-999,999),
+	offsety = love.math.random(-999,999),
+	scale = 0.25,
+	persistence = 0.5,
 	octaves = 4,
-	lacunarity = 0.88,
-	exponentiation = 2.22,
-	height = 2.22
+	lacunarity = 1,
+	exponentiation = 2,
+	height = 1
 },scale=math.min(w,h)/math.max(w,h)*8}
 function visit(f, fa)
 	height = love.graphics.getFont():getHeight()
@@ -48,4 +50,7 @@ function love.mousemoved(x, y, dx, dy, istouch)
 		text:set(key..":\t"..config.sends[key])
 		if not cpuORgpu and shader then shader:send(key,config.sends[key]) end
 	end
+end
+function love.keypressed(key, scancode, isrepeat)
+	if key=="escape" then love.event.push("quit") end
 end
