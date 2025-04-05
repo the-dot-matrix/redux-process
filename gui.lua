@@ -5,7 +5,7 @@ config = {w=0,h=0,a=0.88,gui={},sends={
 	offsety = love.math.random(-999,999),
 	scale = 0.25,
 	persistence = 0.5,
-	octaves = 4,
+	octaves = 1,
 	lacunarity = 1,
 	exponentiation = 2,
 	height = 1
