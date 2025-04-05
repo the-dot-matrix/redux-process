@@ -1,16 +1,7 @@
-local mouse = {pressed=false}
-local config = {
-	scale = 66.6,
-	persistence = 5.55,
-	octaves = 3,
-	lacunarity = 2.22,
-	exponentiation = 1.33,
-	height = 1.33
-}
-local texts = {}
-local width,height = 0,0
-local image,data,shader
-local pixelcode = [[
+--------------------------------
+-- Fractional Brownian Motion --
+--------------------------------
+local cpuORgpu, pixelcode, shader = false, [[
 	uniform float scale;
 	uniform float persistence;
 	uniform float octaves;
@@ -18,7 +9,7 @@ local pixelcode = [[
 	uniform float exponentiation;
 	uniform float height;
     vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
-    float snoise(vec2 v) { // simplex noise
+    float snoise(vec2 v) { // simplex noise, unlicensed, do not use commercially
         const vec4 C = vec4(0.211324865405187, 0.366025403784439,-0.577350269189626, 0.024390243902439);
         vec2 i  = floor(v + dot(v, C.yy) );
         vec2 x0 = v -   i + dot(i, C.xx);
@@ -61,7 +52,6 @@ local pixelcode = [[
     	return texturecolor * color * fbm;
 	}
 ]]
-
 function computeFBM(x, y)
 	local xs = x / config.scale
 	local ys = y / config.scale
@@ -78,8 +68,63 @@ function computeFBM(x, y)
 	return math.pow(total, config.exponentiation) * config.height
 end
 
+----------------------
+-- Configuration UX --
+----------------------
+local config, texts = {
+	scale = 66.6,
+	persistence = 5.55,
+	octaves = 3,
+	lacunarity = 2.22,
+	exponentiation = 1.33,
+	height = 1.33
+}, {}
+function visit(f, fa)
+	height = love.graphics.getFont():getHeight()
+	local accum = 0
+	for i,v in ipairs(texts) do
+		local text = texts[i]
+		f(text,height)
+		if fa then accum = fa(text,accum) end
+		height = height + text[2]:getHeight()
+	end
+	return height,accum
+end
+local mouse = {pressed=false}
+function love.mousepressed(x, y, button, istouch, presses) 
+	mouse.pressed = true 
+	mouse.adjusting = mouse.hovering
+end
+function love.mousereleased(x, y, button, istouch, presses) 
+	mouse.pressed = false 
+	mouse.adjusting = nil
+	mouse.hovering = nil
+end
+function love.mousemoved(x, y, dx, dy, istouch)
+	local f = function(text,height)
+		local w,h = text[2]:getWidth(),text[2]:getHeight()
+		if x>=0 and x<=w and y>=height and y<=height+h then
+			mouse.hovering = text
+			if mouse.adjusting and mouse.hovering ~= mouse.adjusting then
+				love.mousereleased(x,y,1,false,0)
+			end
+		end
+	end
+	visit(f)
+	if mouse.adjusting then
+		local key = mouse.adjusting[1]
+		local text = mouse.adjusting[2]
+		config[key] = config[key] + dx*0.01
+		text:set(key..":\t"..config[key])
+		if not cpuORgpu and shader then shader:send(key,config[key]) end
+	end
+end
+
+----------------------
+-- Load|Update|Draw --
+----------------------
 function love.load(args, unfilteredArgs) 
-    love.graphics.setNewFont(16)
+    love.graphics.setNewFont(32)
     local font = love.graphics.getFont()
     shader = love.graphics.newShader(pixelcode)
     for k,v in pairs(config) do
@@ -87,53 +132,44 @@ function love.load(args, unfilteredArgs)
         shader:send(k,v)
     end
 end
-
+local image,data
 function love.update(dt)
-    -- slow, but works the same as the shader
-	-- local w,h = love.graphics.getDimensions()
-	-- data = love.image.newImageData(w, h)
-	-- for y=0,h-1 do
-	-- 	for x=0,w-1 do
-	-- 		data:setPixel(x, y, 1, 1, 1, computeFBM(x,y))
-	-- 	end
-	-- end
-	-- image = love.graphics.newImage(data)
-end
-
-function love.draw() 
-	love.graphics.setShader(shader)
-	local w,h = love.graphics.getDimensions()
-	love.graphics.rectangle("fill",0,0,w,h)
-	love.graphics.setShader()
-	love.graphics.setColor(0,0,0,1)
-	love.graphics.rectangle("fill",0,0,width,height)
-	love.graphics.setColor(1,1,1,1)
-	love.graphics.print("FPS:\t"..love.timer.getFPS())
-	height = love.graphics.getFont():getHeight()
-	width = 0
-	for i,v in ipairs(texts) do
-		local text = texts[i][2]
-		width = math.max(width, text:getWidth())
-		love.graphics.draw(text,0,height)
-		height = height + text:getHeight()
-	end
-end
-
-function love.mousepressed(x, y, button, istouch, presses) mouse.pressed = true end
-function love.mousereleased(x, y, button, istouch, presses) mouse.pressed = false end
-function love.mousemoved(x, y, dx, dy, istouch)
-	if mouse.pressed then
-	local height = love.graphics.getFont():getHeight()
-		for i,v in ipairs(texts) do
-			local key = texts[i][1]
-			local text = texts[i][2]
-			local w,h = text:getWidth(),text:getHeight()
-			if x>=0 and x<=w and y>=height and y<=height+h then
-				config[key] = config[key] + dx*0.01
-				text:set(key..":\t"..config[key])
-				shader:send(key,config[key])
+    if cpuORgpu then 
+		local w,h = love.graphics.getDimensions()
+		data = love.image.newImageData(w, h)
+		for y=0,h-1 do
+			for x=0,w-1 do
+				data:setPixel(x, y, 1, 1, 1, computeFBM(x,y))
 			end
-			height = height + text:getHeight()
 		end
+		image = love.graphics.newImage(data)
 	end
+end
+local width,height,alpha = 0,0,0.88
+function love.draw()
+	local w,h = love.graphics.getDimensions()
+	if cpuORgpu then
+		love.graphics.draw(image)
+	else
+		love.graphics.setShader(shader)
+		love.graphics.setColor(1,1,1,1)
+		love.graphics.rectangle("fill",0,0,w,h)
+		love.graphics.setShader()
+	end
+	love.graphics.setColor(0,0,0,alpha)
+	love.graphics.rectangle("fill",0,0,width,height)
+	local fps = love.timer.getFPS()
+	if fps<99 then love.graphics.setColor(0.11,0.99,0.11,alpha) end
+	if fps<60 then love.graphics.setColor(0.99,0.99,0.11,alpha) end
+	if fps<30 then love.graphics.setColor(0.99,0.11,0.11,alpha) end
+	love.graphics.print("FPS:\t"..fps)
+	local f = function(text,height) 
+		love.graphics.setColor(0.44,0.11,0.44,alpha)
+		if mouse.hovering and mouse.hovering[1]==text[1] then love.graphics.setColor(0.88,0.11,0.88,alpha) end
+		if mouse.adjusting and mouse.adjusting[1]==text[1] then love.graphics.setColor(0.88,0.88,0.88,alpha) end
+		love.graphics.draw(text[2],0,height) 
+	end
+	local fa = function(text,accum) return math.max(accum,text[2]:getWidth()) end
+	height,width = visit(f, fa)
+	love.graphics.setColor(1,1,1,1)
 end
