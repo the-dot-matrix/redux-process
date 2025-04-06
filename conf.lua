@@ -1,10 +1,10 @@
 love.conf = function(t)
-   t.gammacorrect = true
+   t.version = "11.5"
    t.title, t.identity = "redux-process", "love2d+fennel"
+   t.window.width = 1920
+   t.window.height = 1080
+   t.window.vsync = false
+   t.gammacorrect = true
    t.modules.joystick = false
    t.modules.physics = false
-   t.window.width = 720
-   t.window.height = 450
-   t.window.vsync = false
-   t.version = "11.5"
 end
