@@ -94,7 +94,9 @@ function kmeans_draw()
                         love.graphics.rectangle("fill",p[1],p[2],1,1)
                     end
                 end
-                love.graphics.rectangle("line",x1,y1,x2-x1,y2-y1)
+                if x1 and x2 and y1 and y2 then
+                    love.graphics.rectangle("line",x1,y1,x2-x1,y2-y1)
+                end
             end
             if centroids[k] then
                 love.graphics.rectangle("line",centroids[k][1],centroids[k][2],2,2)
