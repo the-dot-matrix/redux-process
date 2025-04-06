@@ -1,6 +1,6 @@
 local w,h = love.graphics.getDimensions()
 
-config = {w=0,h=0,a=0.88,gui={},sends={
+config = {w=0,h=0,a=0.66,gui={},sends={
 	offsetx = love.math.random(-999,999),
 	offsety = love.math.random(-999,999),
 	scale = 0.25,
@@ -48,9 +48,22 @@ function love.mousemoved(x, y, dx, dy, istouch)
 		local text = mouse.adjusting[2]
 		config.sends[key] = config.sends[key] + dx*0.01
 		text:set(key..":\t"..config.sends[key])
-		if not cpuORgpu and shader then shader:send(key,config.sends[key]) end
+		if not cpuORgpu and shader then 
+			shader:send(key,config.sends[key])
+		end
+		drawn = false
 	end
 end
 function love.keypressed(key, scancode, isrepeat)
 	if key=="escape" then love.event.push("quit") end
+	if key=="space" then
+		config.sends["offsetx"] = love.math.random(-999,999)
+		config.sends["offsety"] = love.math.random(-999,999)
+		config.gui = {}
+		for k,v in pairs(config.sends) do
+        	table.insert(config.gui, {k, love.graphics.newText(font, k..":\t"..v)})
+        	shader:send(k,v)
+    	end
+		drawn = false
+	end
 end

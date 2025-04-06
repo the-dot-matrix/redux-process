@@ -17,5 +17,5 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords) {
   float closestColor = (dither < 0.5) ? 0 : 1;
   float secondClosestColor = 1 - closestColor;
   float distance = abs(closestColor - dither);
-  return (distance < d) ? vec4(closestColor,closestColor,closestColor,1) : vec4(secondClosestColor,secondClosestColor,secondClosestColor,1);
+  return (distance < d) ? vec4(closestColor,closestColor,closestColor,closestColor) : vec4(secondClosestColor,secondClosestColor,secondClosestColor,secondClosestColor);
 }
