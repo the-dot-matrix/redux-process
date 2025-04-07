@@ -1,7 +1,7 @@
 (local Error {})
 
 (fn Error.load [!! oldmode errormessage errortrace]
-  (love.graphics.setFont (love.graphics.newFont 16 :mono))
+  (love.graphics.setFont (love.graphics.newFont 32 :mono))
   (set Error.!! !!)
   (set Error.oldmode oldmode)
   (set Error.prettymsg (Error.color-msg errormessage))
@@ -17,15 +17,15 @@
     (love.graphics.setColor 0.9 0.9 0.9)
     (love.graphics.printf   m             
                             (math.floor (* h 0.00))
-                            (math.floor (* h 0.08)) 
+                            (math.floor (* h 0.02)) 
                             w :center)
     (love.graphics.printf   Error.prettymsg 
                             (math.floor (* h 0.00))
-                            (math.floor (* h 0.16)) 
+                            (math.floor (* h 0.08)) 
                             w :center)
     (love.graphics.printf   Error.prettytrace 
-                            (math.floor (* h 0.08))
-                            (math.floor (* h 0.32)) 
+                            (math.floor (* h 0.04))
+                            (math.floor (* h 0.16)) 
                             w :left)))
 
 (fn Error.keypressed [key scancode repeat] 

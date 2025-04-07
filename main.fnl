@@ -2,7 +2,9 @@
 (local Main {})
 
 (fn love.load [] 
-  (love.graphics.setNewFont 32)
+  (let [(w h) (love.window.getDesktopDimensions)]
+    (love.window.setMode w h {:fullscreen true}))
+  (love.graphics.setNewFont 48)
   (Main.load :main))
 
 (fn love.update [dt]
