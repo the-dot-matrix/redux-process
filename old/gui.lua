@@ -9,7 +9,7 @@ config = {w=0,h=0,a=0.66,gui={},sends={
 	lacunarity = 1,
 	exponentiation = 2,
 	height = 1
-},tilepx=16,tilex=64,tiley=48,border=16}
+},tilepx=8,tilex=128,tiley=96,border=16}
 function visit(f, fa)
 	height = love.graphics.getFont():getHeight()
 	local accum = 0

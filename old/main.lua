@@ -11,7 +11,7 @@ function love.load(args, unfilteredArgs)
 	love.graphics.setDefaultFilter("nearest","nearest")
     love.graphics.setNewFont(32)
     font = love.graphics.getFont()
-    shader = love.graphics.newShader(fbmglsl)
+    shader = love.graphics.newShader("fbm.glsl")
     dither = love.graphics.newShader("dither.glsl")
     for k,v in pairs(config.sends) do
         table.insert(config.gui, {k, love.graphics.newText(font, k..":\t"..v)})
