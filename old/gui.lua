@@ -8,8 +8,7 @@ config = {w=0,h=0,a=0.66,gui={},sends={
 	octaves = 1,
 	lacunarity = 1,
 	exponentiation = 2,
-	height = 1,
-	mystery = 0
+	height = 1
 },tilepx=8,tilex=128,tiley=96,border=16}
 function visit(f, fa)
 	height = love.graphics.getFont():getHeight()

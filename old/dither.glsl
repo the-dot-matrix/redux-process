@@ -14,9 +14,8 @@ vec4 effect(vec4 color, Image tex, vec2 txy, vec2 sxy) {
   int x = int(mod(sxy.x, m));
   int y = int(mod(sxy.y, m));
   float d = thresholdmap[(x + y * m)] / float(M);
-  vec4 texturecolor = Texel(tex, txy);
   vec4 average = vec4(1.0/3.0, 1.0/3.0, 1.0/3.0, 0.0);
-  float unitinterval = dot(texturecolor, average);
+  float unitinterval = dot(Texel(tex, txy), average);
   int closecolor = (unitinterval < 0.5) ? 0 : 1;
   int farcolor = 1 - closecolor;
   float distance = abs(closecolor - unitinterval);
