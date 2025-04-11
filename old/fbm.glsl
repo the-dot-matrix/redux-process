@@ -7,12 +7,12 @@ uniform float lacunarity;
 uniform float exponentiation;
 uniform float height;
 uniform float mystery;
-float z = 3.00000000; // z-axis
-float i = 0.75000000; // i in I unit interval
-float m = 289.000000; // modulus
-float d = 2.00000000; // dimensions
-float p = pow(2.0,d); // 2^#dimensions
-vec2 dp = vec2(d, p); // vector of dimension and power
+const float z = 3.00000000; // z-axis
+const float i = 0.75000000; // i in I unit interval
+const float m = 289.000000; // modulus
+const float d = 2.00000000; // dimensions
+const float p = pow(2.0,d); // 2^#dimensions
+const vec2 dp = vec2(d, p); // vector of dimension and power
 
 vec3 permute3(vec3 t) { return t * (t * 34.0 + 133.0); }
 // Gradient set is a normalized expanded rhombic dodecahedron
@@ -41,7 +41,7 @@ vec2 grad2(float hash) {
     grad *= (1.0 - 0.042942436724648037 * power) * 3.5946317686139184;
     return grad;
 }
-vec3 my_own_implementation_of_2d_opensimplex2s_derivatives(vec2 xy) {
+vec3 my_own_rewrite_of_2d_opensimplex2s_derive(vec2 xy) {
     // BCC lattice split up into 2 SQUARE lattices
     vec2 b0 = floor(xy);
     vec3 i3 = vec3(xy-b0,z);
@@ -70,30 +70,31 @@ vec3 my_own_implementation_of_2d_opensimplex2s_derivatives(vec2 xy) {
     // Return it all as a vec3
     return vec3(derivative, dot(a4,extrapolations));
 }
-vec3 my_own_implementation_of_2d_opensimplex2s(vec2 xy) {
-    vec3 a = my_own_implementation_of_2d_opensimplex2s_derivatives(xy);
-    vec3 b = my_own_implementation_of_2d_opensimplex2s_derivatives(xy+m/2);
+vec3 my_own_rewrite_of_2d_opensimplex2s(vec2 xy) {
+    vec3 a = my_own_rewrite_of_2d_opensimplex2s_derive(xy);
+    vec3 b = my_own_rewrite_of_2d_opensimplex2s_derive(xy+m/2);
     return a + b;
 }
-vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords) {
+vec4 effect(vec4 color, Image tex, vec2 txy, vec2 sxy) {
 	float G = pow(2.0, -persistence);
 	float amplitude = 1.0;
 	float frequency = 1.0;
 	float normalization = 0.0;
 	float total = 0.0;
 	for (int o = 0; o < octaves; o+=1) {
-		vec2 coords = (texture_coords + vec2(offsetx,offsety)) / scale * frequency;
-		float mynoise = my_own_implementation_of_2d_opensimplex2s(coords)[2];
-		total += (mynoise * 0.5 + 0.5) * amplitude;
+        vec2 oxy = vec2(offsetx,offsety);
+		vec2 xy = (txy + oxy) / scale * frequency;
+		float noise = my_own_rewrite_of_2d_opensimplex2s(xy)[2];
+		total += (noise * 0.5 + 0.5) * amplitude;
 		normalization += amplitude;
 		amplitude *= G;
 		frequency *= lacunarity;
 	}
 	total /= normalization;
 	float fbm = pow(total, exponentiation) * height;
-	vec4 texturecolor = Texel(tex, texture_coords);
-    vec2 coords = texture_coords / scale;
-    float n = my_own_implementation_of_2d_opensimplex2s(coords)[2];
+	vec4 texturecolor = Texel(tex, txy);
+    vec2 xy = txy / scale;
+    float n = my_own_rewrite_of_2d_opensimplex2s(xy)[2];
     float m = mystery;
 	return texturecolor * n;
 }
