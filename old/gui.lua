@@ -1,14 +1,14 @@
 local w,h = love.graphics.getDimensions()
 local oob = 55555
 config = {w=0,h=0,a=0.66,gui={},sends={
-	offsetx = love.math.random(-oob,oob),
-	offsety = love.math.random(-oob,oob),
 	scale = 0.25,
-	persistence = 0,
 	octaves = 1,
 	lacunarity = 1,
+	persistence = 0,
 	exponentiation = 2,
-	height = 1
+	height = 1,
+	offsetx = love.math.random(-oob,oob),
+	offsety = love.math.random(-oob,oob)
 },tilepx=8,tilex=128,tiley=96,border=16}
 function visit(f, fa)
 	height = love.graphics.getFont():getHeight()

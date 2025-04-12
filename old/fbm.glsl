@@ -1,15 +1,14 @@
-uniform float offsetx;
-uniform float offsety;
 uniform float scale;
-uniform float persistence;
 uniform float octaves;
 uniform float lacunarity;
+uniform float persistence;
 uniform float exponentiation;
 uniform float height;
+uniform float offsetx;
+uniform float offsety;
 const float q = 17.0000000; // 1st arbitrary prime
 const float r = 53.0000000; // 2nd arbitrary prime
 const float s = 131.000000; // 3rd arbitrary prime
-const float z = 3.00000000; // z-axis
 const float i = 0.75000000; // i in I unit interval
 const float m = pow(q,2.0); // modulus
 const float d = 2.00000000; // #dimensions
@@ -17,17 +16,17 @@ const float p = pow(2.0,d); // 2^#dimensions
 const vec2 dp = vec2(d, p); // vector of dimension and power
 const float g = sqrt(d* i); // gradient expansion
 const float e = s/q/100.00; // point shortener
-const float c = s/r+r/q*.5; // hash constant
+const float c = s/r+ r/q*i; // hash constant
 
 vec3 permute(vec3 t) { return t * (t * r-i + s); }
-vec2 grad2(float hashes) {
+vec2 grad2(float hash) {
     // modulo below implies edge index will be int in (0..d-1)
-	hashes = mod(hashes,p*d);
-    int ei = int(hashes/p);
+	hash = mod(hash,p*d);
+    int ei = int(hash/p);
     // random vertex of a square, +/- 1 each
     // pick one of the p points on the face
-    vec2 square = mod(floor(hashes/dp),d) * d - 1.0;
-    float point = mod(floor(hashes/p), d);
+    vec2 square = mod(floor(hash/dp),d)*d - 1.0;
+    float point = mod(floor(hash/p), d);
     // zero random edge of the d edges connected to the vertex
     vec2 sqrquad = square;
     sqrquad[ei] = 0.0;
@@ -43,7 +42,7 @@ vec2 grad2(float hashes) {
 vec3 my_own_impl_of_2d_opensimplex2s_derive(vec2 xy) {
     // bcc lattice split up into 2 square lattices
     vec2 b0 = floor(xy);
-    vec3 i3 = vec3(xy-b0,z);
+    vec3 i3 = vec3(xy-b0,3.0);
     // pick between pairs of oppposite corners in the square
     float pp = floor(dot(i3,vec3(1-i,1-i,1-i)));
     float np = floor(dot(i3,vec3(i-1,1-i,1-i)));
@@ -81,13 +80,13 @@ vec3 my_own_impl_of_2d_opensimplex2s(vec2 xy) {
     return a + b;
 }
 vec4 effect(vec4 color, Image tex, vec2 txy, vec2 sxy) {
+    vec2 oxy = vec2(offsetx,offsety);
 	float G = pow(2.0, -persistence);
 	float amplitude = 1.0;
 	float frequency = 1.0;
 	float normalization = 0.0;
 	float total = 0.0;
 	for (int o = 0; o < octaves; o+=1) {
-        vec2 oxy = vec2(offsetx,offsety);
 		vec2 xy = (txy + oxy) / scale * frequency;
 		float noise = my_own_impl_of_2d_opensimplex2s(xy)[2];
 		total += (noise * 0.5 + 0.5) * amplitude;

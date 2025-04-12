@@ -16,8 +16,8 @@ vec4 effect(vec4 color, Image tex, vec2 txy, vec2 sxy) {
   float d = thresholdmap[(x + y * m)] / float(M);
   vec4 average = vec4(1.0/3.0, 1.0/3.0, 1.0/3.0, 0.0);
   float unitinterval = dot(Texel(tex, txy), average);
-  int closecolor = (unitinterval < 0.5) ? 0 : 1;
-  int farcolor = 1 - closecolor;
-  float distance = abs(closecolor - unitinterval);
-  return (distance <= d) ? vec4(closecolor) : vec4(farcolor);
+  int nearcolor = (unitinterval < 0.5) ? 0 : 1;
+  int farcolor = 1 - nearcolor;
+  float distance = abs(nearcolor - unitinterval);
+  return (distance <= d) ? vec4(nearcolor) : vec4(farcolor);
 }
