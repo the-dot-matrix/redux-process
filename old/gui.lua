@@ -1,6 +1,6 @@
-local w,h = love.graphics.getDimensions()
-local oob = 55555
-config = {w=0,h=0,a=0.66,gui={},sends={
+local oob,font = 55555
+GUI = {}
+GUI.config = {w=0,h=0,a=0.66,gui={},sends={
 	scale = 0.25,
 	octaves = 1,
 	lacunarity = 1,
@@ -10,11 +10,18 @@ config = {w=0,h=0,a=0.66,gui={},sends={
 	offsetx = love.math.random(-oob,oob),
 	offsety = love.math.random(-oob,oob)
 },tilepx=8,tilex=128,tiley=96,border=16}
-function visit(f, fa)
+function GUI.init()
+    font = love.graphics.getFont()
+    for k,v in pairs(GUI.config.sends) do
+        table.insert(GUI.config.gui, {k, love.graphics.newText(font, k..":\t"..v)})
+        shader:send(k,v)
+    end
+end
+function GUI.visit(f, fa)
 	height = love.graphics.getFont():getHeight()
 	local accum = 0
-	for i,v in ipairs(config.gui) do
-		local text = config.gui[i]
+	for i,v in ipairs(GUI.config.gui) do
+		local text = GUI.config.gui[i]
 		f(text,height)
 		if fa then accum = fa(text,accum) end
 		height = height + text[2]:getHeight()
@@ -22,34 +29,34 @@ function visit(f, fa)
 	return height,accum
 end
 
-mouse = {pressed=false}
+GUI.mouse = {pressed=false}
 function love.mousepressed(x, y, button, istouch, presses) 
-	mouse.pressed = true 
-	mouse.adjusting = mouse.hovering
+	GUI.mouse.pressed = true 
+	GUI.mouse.adjusting = GUI.mouse.hovering
 end
 function love.mousereleased(x, y, button, istouch, presses) 
-	mouse.pressed = false 
-	mouse.adjusting = nil
-	mouse.hovering = nil
+	GUI.mouse.pressed = false 
+	GUI.mouse.adjusting = nil
+	GUI.mouse.hovering = nil
 end
 function love.mousemoved(x, y, dx, dy, istouch)
 	local f = function(text,height)
 		local w,h = text[2]:getWidth(),text[2]:getHeight()
 		if x>=0 and x<=w and y>=height and y<=height+h then
-			mouse.hovering = text
-			if mouse.adjusting and mouse.hovering ~= mouse.adjusting then
+			GUI.mouse.hovering = text
+			if GUI.mouse.adjusting and GUI.mouse.hovering ~= GUI.mouse.adjusting then
 				love.mousereleased(x,y,1,false,0)
 			end
 		end
 	end
-	visit(f)
-	if mouse.adjusting then
-		local key = mouse.adjusting[1]
-		local text = mouse.adjusting[2]
-		config.sends[key] = config.sends[key] + dx*0.01
-		text:set(key..":\t"..config.sends[key])
+	GUI.visit(f)
+	if GUI.mouse.adjusting then
+		local key = GUI.mouse.adjusting[1]
+		local text = GUI.mouse.adjusting[2]
+		GUI.config.sends[key] = GUI.config.sends[key] + dx*0.01
+		text:set(key..":\t"..GUI.config.sends[key])
 		if not cpuORgpu and shader then 
-			shader:send(key,config.sends[key])
+			shader:send(key,GUI.config.sends[key])
 		end
 		drawn = false
 	end
@@ -57,13 +64,12 @@ end
 function love.keypressed(key, scancode, isrepeat)
 	if key=="escape" then love.event.push("quit") end
 	if key=="space" then
-		config.sends["offsetx"] = love.math.random(-oob,oob)
-		config.sends["offsety"] = love.math.random(-oob,oob)
-		config.gui = {}
-		for k,v in pairs(config.sends) do
-        	table.insert(config.gui, {k, love.graphics.newText(font, k..":\t"..v)})
-        	shader:send(k,v)
-    	end
+		GUI.config.sends["offsetx"] = love.math.random(-oob,oob)
+		GUI.config.sends["offsety"] = love.math.random(-oob,oob)
+		GUI.config.gui = {}
+		GUI.init()
 		drawn = false
 	end
 end
+
+return GUI

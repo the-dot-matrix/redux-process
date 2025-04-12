@@ -21,7 +21,7 @@ function pixel2point(x, y, r, g, b, a)
     end
     return r, g, b, a
 end
-function kmeans_init()
+function kmeans_init(w,h)
     centroids = {}
     for k=1,K do
         -- Initialization: choose k centroids (Forgy, Random Partition, etc.)
@@ -30,9 +30,10 @@ function kmeans_init()
     end
 end
 function image2points(imagedata)
+    local w,h = imagedata:getWidth(),imagedata:getHeight()
     points = {}
-    imagedata:mapPixel(pixel2point,0,0,imagedata:getWidth(),imagedata:getHeight())
-    kmeans_init()
+    imagedata:mapPixel(pixel2point,0,0,w,h)
+    kmeans_init(w,h)
 end
 
 function distance(p1,p2)

@@ -1,6 +1,6 @@
-require("gui")
+GUI = require("gui")
 require("kmeans")
-w,h,font = love.graphics.getDimensions()
+local width,height = love.graphics.getDimensions()
 local image,data
 drawn = false
 
@@ -10,26 +10,22 @@ function loadshader(filename)
 	return contents
 end
 function love.load(args, unfilteredArgs) 
-	w,h=love.window.getDesktopDimensions()
-	love.window.setMode(w,h)
+	width,height=love.window.getDesktopDimensions()
+	love.window.setMode(width,height)
 	love.graphics.setDefaultFilter("nearest","nearest")
     love.graphics.setNewFont(32)
-    font = love.graphics.getFont()
     shader = love.graphics.newShader(loadshader("fbm.glsl"))
     dither = love.graphics.newShader(loadshader("dither.glsl"))
-    for k,v in pairs(config.sends) do
-        table.insert(config.gui, {k, love.graphics.newText(font, k..":\t"..v)})
-        shader:send(k,v)
-    end
-    texture = love.graphics.newCanvas(config.tilex,config.tiley)
-    todither = love.graphics.newCanvas(config.tilex,config.tiley)
-    dithered = love.graphics.newCanvas(config.tilex,config.tiley)
-    screen = love.graphics.newCanvas(config.tilex+config.border,config.tiley+config.border)
+    GUI.init()
+    texture = love.graphics.newCanvas(GUI.config.tilex,GUI.config.tiley)
+    todither = love.graphics.newCanvas(GUI.config.tilex,GUI.config.tiley)
+    dithered = love.graphics.newCanvas(GUI.config.tilex,GUI.config.tiley)
+    screen = love.graphics.newCanvas(GUI.config.tilex+GUI.config.border,GUI.config.tiley+GUI.config.border)
 end
 
 function love.update(dt)
 	if drawn and not clustering then
-		image2points(dithered:newImageData(nil,nil,0,0,todither:getWidth(),todither:getHeight()))
+		image2points(dithered:newImageData(nil,nil,0,0,dithered:getWidth(),dithered:getHeight()))
 		clustering = true
 	else
 		clustering = drawn
@@ -45,7 +41,7 @@ function love.draw()
 	if not drawn then
 		love.graphics.setCanvas(texture)
 		love.graphics.setColor(1,1,1,1)
-		love.graphics.rectangle("fill",0,0,config.tilex,config.tiley)
+		love.graphics.rectangle("fill",0,0,GUI.config.tilex,GUI.config.tiley)
 		
 		love.graphics.setCanvas(todither)
 		love.graphics.clear(0,0,0,1)
@@ -60,7 +56,7 @@ function love.draw()
 		love.graphics.setCanvas(screen)
 		love.graphics.clear(0,0,0,1)
 		love.graphics.setShader()
-		love.graphics.draw(dithered,config.border/2,config.border/2)
+		love.graphics.draw(dithered,GUI.config.border/2,GUI.config.border/2)
 
 		love.graphics.setCanvas()
 		love.graphics.setColor(1,1,1,1)
@@ -68,26 +64,26 @@ function love.draw()
 	end
 	love.graphics.clear(0.25,0.25,0.25,1)
 	love.graphics.push()
-	love.graphics.translate((w-screen:getWidth()*config.tilepx)/2,(h-screen:getHeight()*config.tilepx)/2)
-	love.graphics.scale(config.tilepx,config.tilepx)
+	love.graphics.translate((width-screen:getWidth()*GUI.config.tilepx)/2,(height-screen:getHeight()*GUI.config.tilepx)/2)
+	love.graphics.scale(GUI.config.tilepx,GUI.config.tilepx)
 	love.graphics.draw(screen)
-	love.graphics.translate(config.border/2, config.border/2)
+	love.graphics.translate(GUI.config.border/2, GUI.config.border/2)
 	kmeans_draw()
 	love.graphics.pop()
-	love.graphics.setColor(0,0,0,config.a)
-	love.graphics.rectangle("fill",0,0,config.w,config.h)
+	love.graphics.setColor(0,0,0,GUI.config.a)
+	love.graphics.rectangle("fill",0,0,GUI.config.w,GUI.config.h)
 	local fps = love.timer.getFPS()
-	if fps<99 then love.graphics.setColor(0.11,0.99,0.11,config.a) end
-	if fps<60 then love.graphics.setColor(0.99,0.99,0.11,config.a) end
-	if fps<30 then love.graphics.setColor(0.99,0.11,0.11,config.a) end
+	if fps<99 then love.graphics.setColor(0.11,0.99,0.11,GUI.config.a) end
+	if fps<60 then love.graphics.setColor(0.99,0.99,0.11,GUI.config.a) end
+	if fps<30 then love.graphics.setColor(0.99,0.11,0.11,GUI.config.a) end
 	love.graphics.print("FPS:"..fps)
 	local f = function(text,height) 
-		love.graphics.setColor(0.44,0.44,0.44,config.a)
-		if mouse.hovering and mouse.hovering[1]==text[1] then love.graphics.setColor(0.66,0.66,0.66,config.a) end
-		if mouse.adjusting and mouse.adjusting[1]==text[1] then love.graphics.setColor(0.88,0.88,0.88,config.a) end
+		love.graphics.setColor(0.44,0.44,0.44,GUI.config.a)
+		if GUI.mouse.hovering and GUI.mouse.hovering[1]==text[1] then love.graphics.setColor(0.66,0.66,0.66,GUI.config.a) end
+		if GUI.mouse.adjusting and GUI.mouse.adjusting[1]==text[1] then love.graphics.setColor(0.88,0.88,0.88,GUI.config.a) end
 		love.graphics.draw(text[2],0,height) 
 	end
 	local fa = function(text,accum) return math.max(accum,text[2]:getWidth()) end
-	config.h,config.w = visit(f, fa)
+	GUI.config.h,GUI.config.w = GUI.visit(f, fa)
 	love.graphics.setColor(1,1,1,1)
 end
