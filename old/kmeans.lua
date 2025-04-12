@@ -89,8 +89,8 @@ function kmeans_draw()
     if clusters and centroids then 
         for k=1,K do
             love.graphics.setColor(colors[k])
-            local x1,x2,y1,y2
             if clusters[k] then
+                local x1,x2,y1,y2
                 for i,p in ipairs(clusters[k]) do
                     if not x1 or p[1]<x1 then x1=p[1] end
                     if not x2 or p[1]>x2 then x2=p[1] end
@@ -101,7 +101,7 @@ function kmeans_draw()
                     end
                 end
                 if x1 and x2 and y1 and y2 then
-                    love.graphics.rectangle("line",x1,y1,x2-x1,y2-y1)
+                    love.graphics.rectangle("line",x1-0.5,y1-0.5,x2-x1+2,y2-y1+2)
                 end
             end
             if centroids[k] then

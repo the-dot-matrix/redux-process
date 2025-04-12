@@ -1,4 +1,3 @@
-require("fbm")
 require("gui")
 require("kmeans")
 w,h,font = love.graphics.getDimensions()
@@ -29,15 +28,6 @@ function love.load(args, unfilteredArgs)
 end
 
 function love.update(dt)
-    if cpuORgpu and not drawn then 
-		data = love.image.newImageData(config.tilex,config.tiley)
-		for y=0,config.tiley-1 do
-			for x=0,config.tilex-1 do
-				data:setPixel(x, y, 1, 1, 1, computeFBM(x,y))
-			end
-		end
-		image = love.graphics.newImage(data)
-	end
 	if drawn and not clustering then
 		image2points(dithered:newImageData(nil,nil,0,0,todither:getWidth(),todither:getHeight()))
 		clustering = true
@@ -59,12 +49,8 @@ function love.draw()
 		
 		love.graphics.setCanvas(todither)
 		love.graphics.clear(0,0,0,1)
-		if cpuORgpu then 
-			love.graphics.draw(image)
-		else
-			love.graphics.setShader(shader)
-			love.graphics.draw(texture)
-		end
+		love.graphics.setShader(shader)
+		love.graphics.draw(texture)
 
 		love.graphics.setCanvas(dithered)
 		love.graphics.clear(0,0,0,1)
