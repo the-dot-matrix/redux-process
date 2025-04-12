@@ -1,8 +1,8 @@
 GUI = require("gui")
 require("kmeans")
 local width,height = love.graphics.getDimensions()
-local image,data
-drawn = false
+local dither
+local texture,todither,dithered,screen
 
 function loadshader(filename)
 	local contents, _ = love.filesystem.read(filename)
@@ -14,7 +14,7 @@ function love.load(args, unfilteredArgs)
 	love.window.setMode(width,height)
 	love.graphics.setDefaultFilter("nearest","nearest")
     love.graphics.setNewFont(32)
-    shader = love.graphics.newShader(loadshader("fbm.glsl"))
+    GUI.shader = love.graphics.newShader(loadshader("fbm.glsl"))
     dither = love.graphics.newShader(loadshader("dither.glsl"))
     GUI.init()
     texture = love.graphics.newCanvas(GUI.config.tilex,GUI.config.tiley)
@@ -24,11 +24,11 @@ function love.load(args, unfilteredArgs)
 end
 
 function love.update(dt)
-	if drawn and not clustering then
+	if GUI.drawn and not clustering then
 		image2points(dithered:newImageData(nil,nil,0,0,dithered:getWidth(),dithered:getHeight()))
 		clustering = true
 	else
-		clustering = drawn
+		clustering = GUI.drawn
 	end
 	if clustering and not converged then
 		kmeans_iter()
@@ -38,14 +38,14 @@ function love.update(dt)
 end
 
 function love.draw()
-	if not drawn then
+	if not GUI.drawn then
 		love.graphics.setCanvas(texture)
 		love.graphics.setColor(1,1,1,1)
 		love.graphics.rectangle("fill",0,0,GUI.config.tilex,GUI.config.tiley)
 		
 		love.graphics.setCanvas(todither)
 		love.graphics.clear(0,0,0,1)
-		love.graphics.setShader(shader)
+		love.graphics.setShader(GUI.shader)
 		love.graphics.draw(texture)
 
 		love.graphics.setCanvas(dithered)
@@ -60,7 +60,7 @@ function love.draw()
 
 		love.graphics.setCanvas()
 		love.graphics.setColor(1,1,1,1)
-		drawn = true
+		GUI.drawn = true
 	end
 	love.graphics.clear(0.25,0.25,0.25,1)
 	love.graphics.push()

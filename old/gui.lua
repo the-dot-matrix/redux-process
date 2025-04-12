@@ -14,7 +14,7 @@ function GUI.init()
     font = love.graphics.getFont()
     for k,v in pairs(GUI.config.sends) do
         table.insert(GUI.config.gui, {k, love.graphics.newText(font, k..":\t"..v)})
-        shader:send(k,v)
+        GUI.shader:send(k,v)
     end
 end
 function GUI.visit(f, fa)
@@ -55,10 +55,10 @@ function love.mousemoved(x, y, dx, dy, istouch)
 		local text = GUI.mouse.adjusting[2]
 		GUI.config.sends[key] = GUI.config.sends[key] + dx*0.01
 		text:set(key..":\t"..GUI.config.sends[key])
-		if not cpuORgpu and shader then 
-			shader:send(key,GUI.config.sends[key])
+		if not cpuORgpu and GUI.shader then 
+			GUI.shader:send(key,GUI.config.sends[key])
 		end
-		drawn = false
+		GUI.drawn = false
 	end
 end
 function love.keypressed(key, scancode, isrepeat)
@@ -68,7 +68,7 @@ function love.keypressed(key, scancode, isrepeat)
 		GUI.config.sends["offsety"] = love.math.random(-oob,oob)
 		GUI.config.gui = {}
 		GUI.init()
-		drawn = false
+		GUI.drawn = false
 	end
 end
 

@@ -1,6 +1,6 @@
-K = 12
-points,centroids,clusters = nil,nil,nil
-clustering,converged = false,false
+local K = 12
+local points,centroids,clusters = nil,nil,nil
+local clustering,converged = false,false
 local colors = {
     {1,0,0,0.5},
     {1,1,0,0.5},
@@ -26,7 +26,9 @@ function kmeans_init(w,h)
     for k=1,K do
         -- Initialization: choose k centroids (Forgy, Random Partition, etc.)
         -- centroids = [c1, c2, ..., ck]
-        table.insert(centroids,points[love.math.random(1,#points)])
+        --local point = points[love.math.random(1,#points)]
+        local point = {love.math.random(0,w),love.math.random(0,h)}
+        table.insert(centroids,point)
     end
 end
 function image2points(imagedata)
