@@ -13,7 +13,7 @@ const float c = s/r+ r/q*i; // hash constant
 vec3 permute(vec3 t) { return t * (t * r-i + s); }
 vec2 grad(float hash) {
     // modulo below implies edge index will be int in (0..d-1)
-	hash = mod(hash,p*d);
+    hash = mod(hash,p*d);
     int ei = int(hash/p);
     // random vertex of a square,+/- 1 each
     // pick one of the p points on the face
