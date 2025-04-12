@@ -1,8 +1,8 @@
 local w,h = love.graphics.getDimensions()
-
+local oob = 55555
 config = {w=0,h=0,a=0.66,gui={},sends={
-	offsetx = love.math.random(-999,999),
-	offsety = love.math.random(-999,999),
+	offsetx = love.math.random(-oob,oob),
+	offsety = love.math.random(-oob,oob),
 	scale = 0.25,
 	persistence = 0,
 	octaves = 1,
@@ -57,8 +57,8 @@ end
 function love.keypressed(key, scancode, isrepeat)
 	if key=="escape" then love.event.push("quit") end
 	if key=="space" then
-		config.sends["offsetx"] = love.math.random(-999,999)
-		config.sends["offsety"] = love.math.random(-999,999)
+		config.sends["offsetx"] = love.math.random(-oob,oob)
+		config.sends["offsety"] = love.math.random(-oob,oob)
 		config.gui = {}
 		for k,v in pairs(config.sends) do
         	table.insert(config.gui, {k, love.graphics.newText(font, k..":\t"..v)})
