@@ -1,3 +1,4 @@
+(local fennel (require :lib.fennel))
 (var (mode name) nil)
 (local Main {})
 

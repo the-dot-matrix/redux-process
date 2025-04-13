@@ -18,4 +18,4 @@
          ,?body
          ,keys)))
 
-{: incf : decf : lerp : clamp : arctan : with}
+{: incf : decf : clamp : arctan : with}
