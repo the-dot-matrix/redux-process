@@ -7,7 +7,8 @@ lovegit = https://github.com/love2d/love/releases/download/
 loveversion = 11.5
 loveurl = $(lovegit)$(loveversion)/
 lovefile = love-$(loveversion)-x86_64.AppImage
-love = /usr/bin/love
+love = bin/love
+path = /usr/bin/love
 default:
 
 $(fennel):
@@ -17,12 +18,11 @@ $(fennel):
 $(love):
 	sudo rm -f $(love)
 	wget $(loveurl)$(lovefile)
-	mv $(lovefile) bin/love
-	chmod 755 bin/love
-	sudo ln -s `realpath bin/love` $(love)
+	mv $(lovefile) $(love)
+	chmod 755 $(love)
+	sudo ln -s `realpath $(love)` $(path)
 
 install: $(fennel) $(love)
 uninstall:
 	rm -f $(fennel)
-	sudo rm -f $(love) bin/love
-
+	sudo rm -f $(path) $(love)
