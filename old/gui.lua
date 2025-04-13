@@ -9,7 +9,7 @@ GUI.config = {w=0,h=0,a=0.66,gui={},sends={
 	height = 1,
 	offsetx = love.math.random(-oob,oob),
 	offsety = love.math.random(-oob,oob)
-},tilepx=8,tilex=128,tiley=96,border=16}
+},tilepx=4,tilex=320,tiley=160,border=16}
 function GUI.init()
     font = love.graphics.getFont()
     for k,v in pairs(GUI.config.sends) do

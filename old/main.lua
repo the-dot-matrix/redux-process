@@ -1,8 +1,8 @@
 GUI = require("gui")
-require("kmeans")
+KMEANS = require("kmeans")
 local width,height = love.graphics.getDimensions()
 local dither
-local texture,todither,dithered,screen
+local allwhite,fbmnoise,dithered,kmeansed
 
 function loadshader(filename)
 	local contents, _ = love.filesystem.read(filename)
@@ -17,58 +17,53 @@ function love.load(args, unfilteredArgs)
     GUI.shader = love.graphics.newShader(loadshader("fbm.glsl"))
     dither = love.graphics.newShader(loadshader("dither.glsl"))
     GUI.init()
-    texture = love.graphics.newCanvas(GUI.config.tilex,GUI.config.tiley)
-    todither = love.graphics.newCanvas(GUI.config.tilex,GUI.config.tiley)
+    allwhite = love.graphics.newCanvas(GUI.config.tilex,GUI.config.tiley)
+    fbmnoise = love.graphics.newCanvas(GUI.config.tilex,GUI.config.tiley)
     dithered = love.graphics.newCanvas(GUI.config.tilex,GUI.config.tiley)
-    screen = love.graphics.newCanvas(GUI.config.tilex+GUI.config.border,GUI.config.tiley+GUI.config.border)
+    kmeansed = love.graphics.newCanvas(GUI.config.tilex+GUI.config.border,GUI.config.tiley+GUI.config.border)
 end
 
 function love.update(dt)
-	if GUI.drawn and not clustering then
-		image2points(dithered:newImageData(nil,nil,0,0,dithered:getWidth(),dithered:getHeight()))
-		clustering = true
+	if GUI.drawn then
+		if not KMEANS.converged then
+			KMEANS.iter(kmeansed:newImageData(nil,nil,0,0,kmeansed:getWidth(),kmeansed:getHeight()))
+		end
 	else
-		clustering = GUI.drawn
-	end
-	if clustering and not converged then
-		kmeans_iter()
-	else
-		converged = not clustering
+		KMEANS.init(dithered:getWidth(),dithered:getHeight())
 	end
 end
-
 function love.draw()
 	if not GUI.drawn then
-		love.graphics.setCanvas(texture)
+		love.graphics.setCanvas(allwhite)
 		love.graphics.setColor(1,1,1,1)
 		love.graphics.rectangle("fill",0,0,GUI.config.tilex,GUI.config.tiley)
 		
-		love.graphics.setCanvas(todither)
+		love.graphics.setCanvas(fbmnoise)
 		love.graphics.clear(0,0,0,1)
 		love.graphics.setShader(GUI.shader)
-		love.graphics.draw(texture)
+		love.graphics.draw(allwhite)
 
 		love.graphics.setCanvas(dithered)
 		love.graphics.clear(0,0,0,1)
 		love.graphics.setShader(dither)
-		love.graphics.draw(todither)
-		
-		love.graphics.setCanvas(screen)
-		love.graphics.clear(0,0,0,1)
-		love.graphics.setShader()
-		love.graphics.draw(dithered,GUI.config.border/2,GUI.config.border/2)
+		love.graphics.draw(fbmnoise)
 
-		love.graphics.setCanvas()
-		love.graphics.setColor(1,1,1,1)
 		GUI.drawn = true
 	end
+
+	love.graphics.setCanvas(kmeansed)
+	love.graphics.clear(0,0,0,1)
+	love.graphics.setShader(KMEANS.shader)
+	love.graphics.draw(dithered,GUI.config.border/2,GUI.config.border/2)
+	
+	love.graphics.setColor(1,1,1,1)
+	love.graphics.setCanvas()
+	love.graphics.setShader()
 	love.graphics.clear(0.25,0.25,0.25,1)
 	love.graphics.push()
-	love.graphics.translate((width-screen:getWidth()*GUI.config.tilepx)/2,(height-screen:getHeight()*GUI.config.tilepx)/2)
+	love.graphics.translate((width-kmeansed:getWidth()*GUI.config.tilepx)/2,(height-kmeansed:getHeight()*GUI.config.tilepx)/2)
 	love.graphics.scale(GUI.config.tilepx,GUI.config.tilepx)
-	love.graphics.draw(screen)
-	love.graphics.translate(GUI.config.border/2, GUI.config.border/2)
-	kmeans_draw()
+	love.graphics.draw(kmeansed)
 	love.graphics.pop()
 	love.graphics.setColor(0,0,0,GUI.config.a)
 	love.graphics.rectangle("fill",0,0,GUI.config.w,GUI.config.h)
