@@ -8,12 +8,12 @@ readglsl = function(pathto,file)
 end
 local glsl = function(env) 
   return function(modname)
-    local path = modname:gsub("%.", "/") .. ".glsl"
-    if love.filesystem.getInfo(path) then
+    local p = modname:gsub("%.", "/"):gsub("%/glsl", ".glsl")
+    if modname:find("glsl") and love.filesystem.getInfo(p) then
       return function(...)
-        local slashes = {path:find("/")}
-        local pathto = path:sub(1,slashes[#slashes])
-        local file = path:sub(slashes[#slashes]+1)
+        local slashes = {p:find("/")}
+        local pathto = p:sub(1,slashes[#slashes])
+        local file = p:sub(slashes[#slashes]+1)
         return love.graphics.newShader(readglsl(pathto,file))
       end
     end

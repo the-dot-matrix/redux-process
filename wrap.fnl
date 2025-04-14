@@ -25,7 +25,7 @@
           wrapf #(do (Main.keypressed $...) (safef $...))
           handler (if (= e :keypressed) wrapf safef)]
       (tset love.handlers e handler)))
-  (when mode.load (mode.load Main.load ...)))
+  (when mode.load (Main.safely mode.load Main.load ...)))
 
 (fn Main.keypressed [key]
   (when (= key :escape) (love.event.quit)))
