@@ -1,7 +1,7 @@
 (local Main {})
 
 (fn Main.load [!! w h]
-  (set Main.scale 1)
+  (set Main.scale 2)
   (love.graphics.setNewFont 32)
   (set Main.blank (require :src.blank))
   (Main.blank.load (/ w Main.scale) (/ h Main.scale))
@@ -48,10 +48,6 @@
   (love.graphics.scale Main.scale Main.scale)
   (love.graphics.draw Main.kmeans.canvas)
   (love.graphics.setShader)
-  (love.graphics.setCanvas)
-
-  (let [(name version vendor device) (love.graphics.getRendererInfo)]
-    (love.graphics.print (.. "FPS \t" (love.timer.getFPS) "\n"
-      (fennel.view [name version vendor device]))))) 
+  (love.graphics.setCanvas))
 
 Main
