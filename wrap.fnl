@@ -7,7 +7,7 @@
     (love.window.setMode w h {:fullscreen true}))
   (love.graphics.setNewFont 64)
   (love.graphics.setDefaultFilter :nearest :nearest)
-  (Main.load :main))
+  (Main.load :src.main))
 
 (fn love.update [dt]
   (when mode.update (Main.safely mode.update dt)))
@@ -18,7 +18,7 @@
     (when mode.draw (Main.safely mode.draw w h))))
 
 (fn Main.load [new ...]
-  (set (mode name) (values (require (.. :src. new)) new))
+  (set (mode name) (values (require new) new))
   (each [e _ (pairs love.handlers)]
     (let [modef (if (. mode e) (. mode e) #$)
           safef #(Main.safely modef $...)
@@ -33,4 +33,4 @@
 (fn Main.safely [f ...]
   (let [ftrace (fennel.traceback)
         ltrace (debug.traceback)]
-    (xpcall f #(Main.load :error name $ ftrace ltrace) ...)))
+    (xpcall f #(Main.load :trace name $ ftrace ltrace) ...)))
