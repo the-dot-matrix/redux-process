@@ -4,7 +4,7 @@
   (love.graphics.setNewFont 64)
   (love.graphics.setDefaultFilter :nearest :nearest)
   (let [(w h) (love.window.getDesktopDimensions)]
-    (love.window.setMode w h {:fullscreen true})
+    (love.window.setMode w h {:fullscreen true :vsync false})
     (Main.load :src.main w h)))
 
 (fn love.update [dt]
