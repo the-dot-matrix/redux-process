@@ -1,6 +1,6 @@
 (local FBM {})
 
-(fn FBM.load [!!]
+(fn FBM.load [w h]
   (set FBM.shader (require :src.fbm.glsl))
   (set FBM.sends {
     :scale 0.25 :height 1 :exponentiation 2
@@ -9,6 +9,6 @@
     :offsety (love.math.random -55555 55555)})
   (each [key value (pairs FBM.sends)]
     (FBM.shader:send key value))
-  (set FBM.canvas (love.graphics.newCanvas 320 160)))
+  (set FBM.canvas (love.graphics.newCanvas w h)))
 
 FBM

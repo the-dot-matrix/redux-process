@@ -1,6 +1,6 @@
 (local Blank {})
 
-(fn Blank.load [!!]
-  (set Blank.canvas (love.graphics.newCanvas 320 160)))
+(fn Blank.load [w h]
+  (set Blank.canvas (love.graphics.newCanvas w h)))
 
 Blank

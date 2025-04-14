@@ -1,7 +1,7 @@
 (local Dither {})
 
-(fn Dither.load [!!]
+(fn Dither.load [w h]
   (set Dither.shader (require :src.dither.glsl))
-  (set Dither.canvas (love.graphics.newCanvas 320 160)))
+  (set Dither.canvas (love.graphics.newCanvas w h)))
 
 Dither
