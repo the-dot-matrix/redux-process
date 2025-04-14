@@ -5,7 +5,7 @@
 (fn love.load [] 
   (let [(w h) (love.window.getDesktopDimensions)]
     (love.window.setMode w h {:fullscreen true}))
-  (love.graphics.setNewFont 48)
+  (love.graphics.setNewFont 64)
   (love.graphics.setDefaultFilter :nearest :nearest)
   (Main.load :main))
 
@@ -31,4 +31,6 @@
   (when (= key :escape) (love.event.quit)))
 
 (fn Main.safely [f ...]
-  (xpcall f #(Main.load :error name $ (fennel.traceback)) ...))
+  (let [ftrace (fennel.traceback)
+        ltrace (debug.traceback)]
+    (xpcall f #(Main.load :error name $ ftrace ltrace) ...)))

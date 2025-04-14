@@ -1,14 +1,16 @@
 (local Error {})
 
-(fn Error.load [!! oldmode errormessage errortrace]
+(fn Error.load [!! oldmode errormessage fnltrace luatrace]
   (love.graphics.setFont (love.graphics.newFont 32 :mono))
   (set Error.!! !!)
   (set Error.oldmode oldmode)
   (set Error.prettymsg (Error.color-msg errormessage))
-  (set Error.prettytrace "")
-  (each [v (errortrace:gmatch "[^\n]+")]
-    (when (not (v:find "fennel.lua"))
-      (set Error.prettytrace (.. Error.prettytrace v "\n")))))
+  (set Error.fnltrace "")
+  (set Error.luatrace "")
+  (each [v (fnltrace:gmatch "[^\n]+")]
+    (set Error.fnltrace (.. Error.fnltrace v "\n")))
+  (each [v (luatrace:gmatch "[^\n]+")]
+    (set Error.luatrace (.. Error.luatrace v "\n"))))
 
 (fn Error.draw [w h]
   (let [m "Press SPACE to reload last known safe state"]
@@ -23,10 +25,14 @@
                             (math.floor (* h 0.00))
                             (math.floor (* h 0.08)) 
                             w :center)
-    (love.graphics.printf   Error.prettytrace 
+    (love.graphics.printf   Error.fnltrace 
                             (math.floor (* h 0.04))
                             (math.floor (* h 0.16)) 
-                            w :left)))
+                            w :left)
+    (love.graphics.printf   Error.luatrace 
+                            (math.floor (* h -0.04))
+                            (math.floor (* h 0.16)) 
+                            w :right)))
 
 (fn Error.keypressed [key scancode repeat] 
   (match key :space (Error.!! Error.oldmode)))

@@ -1,6 +1,4 @@
-local find = function(sf,env)
-  return sf(env) 
-end
+local searcher = function(search,env) return search(env) end
 local readglsl
 readglsl = function(pathto,file)
   local include = function(f) return readglsl(pathto,f) end
@@ -21,21 +19,6 @@ local glsl = function(env)
     end
   end
 end
-table.insert(package.loaders, find(glsl,_G))
-local instal = {correlate=true, moduleName="lib.fennel"}
-fennel = require("lib.fennel").install(instal)
-debug.traceback = fennel.traceback
-local fnl = function(env) 
-  return function(modname)
-    local path = modname:gsub("%.", "/") .. ".fnl"
-    if love.filesystem.getInfo(path) then
-      return function(...)
-        local code = love.filesystem.read(path)
-        return fennel.eval(code, {env=env, filename=path, correlate=true}, ...)
-      end, path
-    end
-  end
-end
-table.insert(package.loaders, 1, find(fnl,_G))
-table.insert(fennel["macro-searchers"], find(fnl,"_COMPILER"))
-find(fnl,_G)("wrap")()
+table.insert(package.loaders, searcher(glsl,_G))
+fennel = require("lib.fennel")
+fennel.install().dofile("wrap.fnl")
