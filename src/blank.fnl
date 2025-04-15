@@ -1,6 +1,9 @@
-(local Blank {})
+(import-macros {: Object : extends : new} :mac.class)
+(local Blank (extends Blank (require :src.screen)))
 
-(fn Blank.load [w h]
-  (set Blank.canvas (love.graphics.newCanvas w h)))
+; TODO replace with macro
+(fn Blank.new [! w h]
+  (setmetatable {} !)
+  (!.super:new w h))
 
 Blank

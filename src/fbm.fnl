@@ -1,14 +1,13 @@
-(local FBM {})
+(import-macros {: Object : extends : new} :mac.class)
+(local FBM (extends FBM (require :src.screen)))
 
-(fn FBM.load [w h]
-  (set FBM.shader (require :src.fbm.glsl))
-  (set FBM.sends {
-    :scale 0.25 :height 1 :exponentiation 2
-    :octaves 1 :lacunarity 1 :persistence 0
-    :offsetx (love.math.random -55555 55555)
-    :offsety (love.math.random -55555 55555)})
-  (each [key value (pairs FBM.sends)]
-    (FBM.shader:send key value))
-  (set FBM.canvas (love.graphics.newCanvas w h)))
+; TODO replace with macro
+(fn FBM.new [! w h]
+  (setmetatable {} !)
+  (!.super:new w h :src.fbm.glsl {
+    :scale [0.25] :height [1] :exponentiation [2]
+    :octaves [1] :lacunarity [1] :persistence [0]
+    :offsetx [(love.math.random -55555 55555)]
+    :offsety [(love.math.random -55555 55555)]}))
 
 FBM

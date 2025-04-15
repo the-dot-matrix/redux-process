@@ -1,53 +1,27 @@
 (local Main {})
+(local Blank  (require :src.blank))
+(local FBM    (require :src.fbm))
+(local Dither (require :src.dither))
+(local Kmeans (require :src.kmeans))
 
 (fn Main.load [!! w h]
-  (set Main.scale 2)
+  (set Main.scale 1)
   (love.graphics.setNewFont 32)
-  (set Main.blank (require :src.blank))
-  (Main.blank.load (/ w Main.scale) (/ h Main.scale))
-  (set Main.fbm (require :src.fbm))
-  (Main.fbm.load (/ w Main.scale) (/ h Main.scale))
-  (set Main.dither (require :src.dither))
-  (Main.dither.load (/ w Main.scale) (/ h Main.scale))
-  (set Main.kmeans (require :src.kmeans))
-  (Main.kmeans.load (/ w Main.scale) (/ h Main.scale)))
+  (let [(sw sh) (values (/ w Main.scale) (/ h Main.scale))]
+    (set Main.blank (Blank:new sw sh))
+    (set Main.fbm (FBM:new sw sh))
+    (set Main.dither (Dither:new sw sh))
+    (set Main.kmeans (Kmeans:new sw sh))))
 
 (fn Main.draw [w h]
-  (love.graphics.setCanvas Main.blank.canvas)
-  (love.graphics.clear 0 0 0 1)
-  (love.graphics.setShader) ;Main.blank.shader
-  (love.graphics.rectangle "fill" 0 0 (/ w Main.scale) 
-                                      (/ h Main.scale))
-  (love.graphics.setShader)
-  (love.graphics.setCanvas)
-  
-  (love.graphics.setCanvas Main.fbm.canvas)
-  (love.graphics.clear 0 0 0 1)
-  (love.graphics.setShader Main.fbm.shader)
-  (love.graphics.draw Main.blank.canvas)
-  (love.graphics.setShader)
-  (love.graphics.setCanvas)  
-  
-  (love.graphics.setCanvas Main.dither.canvas)
-  (love.graphics.clear 0 0 0 1)
-  (love.graphics.setShader Main.dither.shader)
-  (love.graphics.draw Main.fbm.canvas)
-  (love.graphics.setShader)
-  (love.graphics.setCanvas)
-
-  (love.graphics.setCanvas Main.kmeans.canvas)
-  (love.graphics.clear 0 0 0 1)
-  (love.graphics.setShader Main.kmeans.shader)
-  (love.graphics.draw Main.dither.canvas)
-  (love.graphics.setShader)
-  (love.graphics.setCanvas)
-  
-  (love.graphics.setCanvas) ;default screen
-  (love.graphics.clear 0.25 0.25 0.25 1)
-  (love.graphics.setShader) ;default shader
-  (love.graphics.scale Main.scale Main.scale)
-  (love.graphics.draw Main.kmeans.canvas)
-  (love.graphics.setShader)
-  (love.graphics.setCanvas))
+  (Main.blank:draw #(love.graphics.rectangle
+    "fill" 0 0 (/ w Main.scale) (/ h Main.scale)))
+  (Main.fbm:draw #(love.graphics.draw
+    Main.blank.canvas))
+  (Main.dither:draw #(love.graphics.draw
+    Main.fbm.canvas))
+  (Main.kmeans:draw #(love.graphics.draw
+    Main.dither.canvas))
+  (love.graphics.draw Main.kmeans.canvas))
 
 Main

@@ -1,7 +1,9 @@
-(local Dither {})
+(import-macros {: Object : extends : new} :mac.class)
+(local Dither (extends Dither (require :src.screen)))
 
-(fn Dither.load [w h]
-  (set Dither.shader (require :src.dither.glsl))
-  (set Dither.canvas (love.graphics.newCanvas w h)))
+; TODO replace with macro
+(fn Dither.new [! w h]
+  (setmetatable {} !)
+  (!.super:new w h :src.dither.glsl))
 
 Dither

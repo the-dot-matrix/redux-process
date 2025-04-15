@@ -43,6 +43,6 @@
 (fn Main.keypressed [key]
   (when (= key :escape) (love.event.quit)))
 
-(fn Main.safely [f ...] ;FIXME tracebacks suck, embed deeper
+(fn Main.safely [f ...]
   (when f (let [ferr (fennel.traceback) lerr (debug.traceback)]
     (xpcall f #(Main.load :trace Main.name $ ferr lerr) ...))))

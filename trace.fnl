@@ -1,5 +1,6 @@
 (local Error {})
 
+; TODO cleanup, better traces, deeper embedding of tracebacks
 (fn Error.load [!! oldmode errormessage fnltrace luatrace]
   (love.graphics.setFont (love.graphics.newFont 32 :mono))
   (set Error.!! !!)
