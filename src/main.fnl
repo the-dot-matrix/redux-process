@@ -16,12 +16,9 @@
 (fn Main.draw [w h]
   (Main.blank:draw #(love.graphics.rectangle
     "fill" 0 0 (/ w Main.scale) (/ h Main.scale)))
-  (Main.fbm:draw #(love.graphics.draw
-    Main.blank.canvas))
-  (Main.dither:draw #(love.graphics.draw
-    Main.fbm.canvas))
-  (Main.kmeans:draw #(love.graphics.draw
-    Main.dither.canvas))
+  (Main.fbm:draw #(love.graphics.draw Main.blank.canvas))
+  (Main.dither:draw #(love.graphics.draw Main.fbm.canvas))
+  (Main.kmeans:draw #(love.graphics.draw Main.dither.canvas))
   (love.graphics.draw Main.kmeans.canvas))
 
 Main
