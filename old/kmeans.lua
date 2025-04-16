@@ -1,32 +1,32 @@
 local KMEANS = {}
 KMEANS.K = 12
 KMEANS.colors = {
-    {0.50,  0.00,  0.00,    0.5},
-    {0.50,  0.50,  0.00,    0.5},
-    {0.00,  0.50,  0.00,    0.5},
-    {0.00,  0.50,  0.50,    0.5},
-    {0.00,  0.00,  0.50,    0.5},
-    {0.50,  0.00,  0.50,    0.5},
-    {0.50,  0.25,  0.00,    0.5},
-    {0.50,  0.50,  0.25,    0.5},
-    {0.00,  0.50,  0.25,    0.5},
-    {0.25,  0.50,  0.50,    0.5},
-    {0.25,  0.00,  0.50,    0.5},
-    {0.50,  0.25,  0.50,    0.5}
+    {0.20,  0.00,  0.00,    0.2},
+    {0.20,  0.20,  0.00,    0.2},
+    {0.00,  0.20,  0.00,    0.2},
+    {0.00,  0.20,  0.20,    0.2},
+    {0.00,  0.00,  0.20,    0.2},
+    {0.20,  0.00,  0.20,    0.2},
+    {0.20,  0.10,  0.00,    0.2},
+    {0.20,  0.20,  0.10,    0.2},
+    {0.00,  0.20,  0.10,    0.2},
+    {0.10,  0.20,  0.20,    0.2},
+    {0.10,  0.00,  0.20,    0.2},
+    {0.20,  0.10,  0.20,    0.2}
 }
 function KMEANS.init(w,h)
     KMEANS.converged = false
     KMEANS.centroids = {}
-    KMEANS.shader = love.graphics.newShader("kmeans.glsl")
+    KMEANS.shader = love.graphics.newShader("gpu/kmeans.glsl")
     for k=1,KMEANS.K do
         table.insert(KMEANS.centroids,{love.math.random(0,w),love.math.random(0,h)})
-    end  
+    end
     KMEANS.shader:send("centroids", unpack(KMEANS.centroids))
 end
 function KMEANS.cluster(x, y, r, g, b, a)
     for k,v in ipairs(KMEANS.colors) do
         local color = KMEANS.colors[k]
-        if math.abs(r-color[1])<0.1 and math.abs(g-color[2])<0.1 and math.abs(b-color[3])<0.1 and a>0 then
+        if math.abs(r-color[1])<0.01 and math.abs(g-color[2])<0.01 and math.abs(b-color[3])<0.01 and a>0 then
             KMEANS.clusters[k]["x"] = KMEANS.clusters[k]["x"] + x
             KMEANS.clusters[k]["y"] = KMEANS.clusters[k]["y"] + y
             KMEANS.clusters[k]["n"] = KMEANS.clusters[k]["n"] + 1

@@ -5,11 +5,12 @@ local dither
 local allwhite,fbmnoise,dithered,kmeansed
 
 function loadshader(filename)
-	local contents, _ = love.filesystem.read(filename)
+	local pathto = "gpu/"
+	local contents, _ = love.filesystem.read(pathto..filename)
 	contents = contents:gsub("#include \"(.-)\"", loadshader)
 	return contents
 end
-function love.load(args, unfilteredArgs) 
+function love.load(args, unfilteredArgs)
 	width,height=love.window.getDesktopDimensions()
 	love.window.setMode(width,height)
 	love.graphics.setDefaultFilter("nearest","nearest")
@@ -37,7 +38,7 @@ function love.draw()
 		love.graphics.setCanvas(allwhite)
 		love.graphics.setColor(1,1,1,1)
 		love.graphics.rectangle("fill",0,0,GUI.config.tilex,GUI.config.tiley)
-		
+
 		love.graphics.setCanvas(fbmnoise)
 		love.graphics.clear(0,0,0,1)
 		love.graphics.setShader(GUI.shader)
@@ -55,7 +56,7 @@ function love.draw()
 	love.graphics.clear(0,0,0,1)
 	love.graphics.setShader(KMEANS.shader)
 	love.graphics.draw(dithered,GUI.config.border/2,GUI.config.border/2)
-	
+
 	love.graphics.setColor(1,1,1,1)
 	love.graphics.setCanvas()
 	love.graphics.setShader()
@@ -72,11 +73,11 @@ function love.draw()
 	if fps<60 then love.graphics.setColor(0.99,0.99,0.11,GUI.config.a) end
 	if fps<30 then love.graphics.setColor(0.99,0.11,0.11,GUI.config.a) end
 	love.graphics.print("FPS:"..fps)
-	local f = function(text,height) 
+	local f = function(text,height)
 		love.graphics.setColor(0.44,0.44,0.44,GUI.config.a)
 		if GUI.mouse.hovering and GUI.mouse.hovering[1]==text[1] then love.graphics.setColor(0.66,0.66,0.66,GUI.config.a) end
 		if GUI.mouse.adjusting and GUI.mouse.adjusting[1]==text[1] then love.graphics.setColor(0.88,0.88,0.88,GUI.config.a) end
-		love.graphics.draw(text[2],0,height) 
+		love.graphics.draw(text[2],0,height)
 	end
 	local fa = function(text,accum) return math.max(accum,text[2]:getWidth()) end
 	GUI.config.h,GUI.config.w = GUI.visit(f, fa)

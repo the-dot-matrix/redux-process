@@ -30,12 +30,12 @@ function GUI.visit(f, fa)
 end
 
 GUI.mouse = {pressed=false}
-function love.mousepressed(x, y, button, istouch, presses) 
-	GUI.mouse.pressed = true 
+function love.mousepressed(x, y, button, istouch, presses)
+	GUI.mouse.pressed = true
 	GUI.mouse.adjusting = GUI.mouse.hovering
 end
-function love.mousereleased(x, y, button, istouch, presses) 
-	GUI.mouse.pressed = false 
+function love.mousereleased(x, y, button, istouch, presses)
+	GUI.mouse.pressed = false
 	GUI.mouse.adjusting = nil
 	GUI.mouse.hovering = nil
 end
@@ -55,7 +55,7 @@ function love.mousemoved(x, y, dx, dy, istouch)
 		local text = GUI.mouse.adjusting[2]
 		GUI.config.sends[key] = GUI.config.sends[key] + dx*0.01
 		text:set(key..":\t"..GUI.config.sends[key])
-		if not cpuORgpu and GUI.shader then 
+		if not cpuORgpu and GUI.shader then
 			GUI.shader:send(key,GUI.config.sends[key])
 		end
 		GUI.drawn = false

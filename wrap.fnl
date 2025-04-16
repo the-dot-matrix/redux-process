@@ -1,6 +1,6 @@
 (local Main {})
 
-(fn love.load [] 
+(fn love.load []
   (love.graphics.setNewFont 64)
   (love.graphics.setDefaultFilter :nearest :nearest)
   (let [(w h) (love.window.getDesktopDimensions)]

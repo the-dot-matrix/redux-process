@@ -6,7 +6,7 @@ readglsl = function(pathto,file)
   contents = contents:gsub("#include \"(.-)\"", include)
   return contents
 end
-local glsl = function(env) 
+local glsl = function(env)
   return function(modname)
     local p = modname:gsub("%.", "/"):gsub("%/glsl", ".glsl")
     if modname:find("glsl") and love.filesystem.getInfo(p) then

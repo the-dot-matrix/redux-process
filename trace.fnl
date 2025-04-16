@@ -18,30 +18,30 @@
     (love.graphics.setColor 0.34 0.61 0.86)
     (love.graphics.rectangle :fill 0 0 w h)
     (love.graphics.setColor 0.9 0.9 0.9)
-    (love.graphics.printf   m             
+    (love.graphics.printf   m
                             (math.floor (* h 0.00))
-                            (math.floor (* h 0.02)) 
+                            (math.floor (* h 0.02))
                             w :center)
-    (love.graphics.printf   Error.prettymsg 
+    (love.graphics.printf   Error.prettymsg
                             (math.floor (* h 0.00))
-                            (math.floor (* h 0.08)) 
+                            (math.floor (* h 0.08))
                             w :center)
-    (love.graphics.printf   Error.fnltrace 
+    (love.graphics.printf   Error.fnltrace
                             (math.floor (* h 0.04))
-                            (math.floor (* h 0.16)) 
+                            (math.floor (* h 0.16))
                             w :left)
-    (love.graphics.printf   Error.luatrace 
+    (love.graphics.printf   Error.luatrace
                             (math.floor (* h -0.04))
-                            (math.floor (* h 0.16)) 
+                            (math.floor (* h 0.16))
                             w :right)))
 
-(fn Error.keypressed [key scancode repeat] 
+(fn Error.keypressed [key scancode repeat]
   (match key :space (Error.!! Error.oldmode)))
 
 (fn Error.color-msg [msg]
-  (if msg 
+  (if msg
     (case (msg:match "(.*)\027%[7m(.*)\027%[0m(.*)")
-      (pre selected post) 
+      (pre selected post)
       [ [1 1 1] pre
         [1 0.2 0.2] selected
         [1 1 1] post]

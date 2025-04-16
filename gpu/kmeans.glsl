@@ -20,7 +20,7 @@ float distance(vec2 p1, vec2 p2) {
     return sqrt(pow(a,2)+pow(b,2));
 }
 vec4 cluster(vec2 p) {
-    float alpha = 0.5;
+    float alpha = 0.2;
     float mindist = -1;
     int assignment = -1;
     for (int k = 0; k < K; k += 1) {

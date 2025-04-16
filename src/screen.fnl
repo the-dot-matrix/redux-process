@@ -7,7 +7,7 @@
 
 (fn Screen.update [! sends]
   (when !.shader (each [key value (pairs sends)]
-    (if (pcall #(unpack value)) 
+    (if (pcall #(unpack value))
         (!.shader:send key (unpack value))
         (!.shader:send key value)))))
 
