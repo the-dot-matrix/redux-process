@@ -1,6 +1,5 @@
 (import-macros {: Object : extends : new} :mac.class)
-(local Screen (extends Screen (Object)))
-
+(extends Screen (Object))
 (new Screen [! w h glsl send]
   (when glsl (set !.shader (require glsl))
     (when send (each [key value (pairs send)]

@@ -1,5 +1,5 @@
-(import-macros {: Object : extends : new} :mac.class)
-(local Kmeans (extends Kmeans (require :src.screen)))
+(import-macros {: extends : new} :mac.class)
+(extends Kmeans (require :src.screen))
 
 ; TODO replace with macro
 (fn Kmeans.new [! w h]

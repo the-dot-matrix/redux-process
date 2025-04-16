@@ -1,5 +1,5 @@
-(import-macros {: Object : extends : new} :mac.class)
-(local Dither (extends Dither (require :src.screen)))
+(import-macros {: extends : new} :mac.class)
+(extends Dither (require :src.screen))
 
 ; TODO replace with macro
 (fn Dither.new [! w h]

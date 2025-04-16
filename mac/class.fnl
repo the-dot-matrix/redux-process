@@ -1,19 +1,15 @@
-(fn Object [] `{:new (fn [!#] !#)})
+(fn Object [] `(require :mac.object))
 
-(fn extends [a b] `(do
-  (local ,a {})
-  (set ((. ,a :__index) (. ,a :super)) (values ,a ,b))
-  (setmetatable ,a ,b)
-  ,a))
+(fn extends [a b]
+  `(local ,(sym (tostring a)) ((. ,b :extend) ,b)))
 
-; TODO fix super constructor chaining
-(fn new [c args & body]
-  `(fn ,(sym (.. (tostring c) :.new)) ,args
-      (local ,(sym (tostring (. args 1)))
-              (setmetatable {} (. ,args 1)))
+(fn new [c vs & body]
+  `(fn ,(sym (.. (tostring c) :.new)) ,vs
+      (local ,(sym (tostring (. vs 1)))
+        (setmetatable
+          ( ,(sym (.. (tostring c) :.super.new)) ,(unpack vs))
+            ,(sym (tostring (. vs 1)))))
       (do ,(unpack body))
-      (,(sym (.. (tostring (. args 1)) ".super.new"))
-        (unpack ,args))
-      ,(sym (tostring (. args 1)))))
+      ,(sym (tostring (. vs 1)))))
 
 {: Object : extends : new}

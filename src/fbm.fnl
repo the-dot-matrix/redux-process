@@ -1,5 +1,5 @@
-(import-macros {: Object : extends : new} :mac.class)
-(local FBM (extends FBM (require :src.screen)))
+(import-macros {: extends : new} :mac.class)
+(extends FBM (require :src.screen))
 
 ; TODO replace with macro
 (fn FBM.new [! w h]

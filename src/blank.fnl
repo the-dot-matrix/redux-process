@@ -1,8 +1,4 @@
-(import-macros {: Object : extends : new} :mac.class)
-(local Blank (extends Blank (require :src.screen)))
-
-; TODO fix super constructor chaining
-;(new Blank [! w h])
-(fn Blank.new [! w h] (!.super:new w h))
-
+(import-macros {: extends : new} :mac.class)
+(extends Blank (require :src.screen))
+(new Blank [! w h])
 Blank
