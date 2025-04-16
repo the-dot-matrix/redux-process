@@ -1,10 +1,13 @@
 (import-macros {: Object : extends : new} :mac.class)
 (extends Screen (Object))
-(new Screen [! w h glsl send]
-  (when glsl (set !.shader (require glsl))
-    (when send (each [key value (pairs send)]
-      (!.shader:send key (unpack value)))))
+(new Screen [! w h glsl sends]
+  (when glsl (set !.shader (require glsl)))
+  (when sends (Screen.update ! sends))
   (set !.canvas (love.graphics.newCanvas w h)))
+
+(fn Screen.update [! sends]
+  (when !.shader (each [key value (pairs sends)]
+    (!.shader:send key value))))
 
 (fn Screen.draw [! drawable]
   (love.graphics.setCanvas !.canvas)

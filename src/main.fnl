@@ -22,4 +22,7 @@
   (love.graphics.scale Main.scale Main.scale)
   (love.graphics.draw Main.kmeans.canvas))
 
+(fn Main.keypressed [key]
+  (when (= key :space) (Main.fbm:update)))
+
 Main

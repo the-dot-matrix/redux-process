@@ -25,7 +25,7 @@ vec4 cluster(vec2 p) {
     int assignment = -1;
     for (int k = 0; k < K; k += 1) {
         float dist = distance(p, centroids[k]);
-        if (dist<=1) { alpha=1; }
+        if (dist<=4) { alpha=1; }
         if (mindist==-1 || dist<mindist) {
             mindist = dist;
             assignment = k;
