@@ -1,4 +1,3 @@
-local searcher = function(search,env) return search(env) end
 local readglsl
 readglsl = function(pathto,file)
   local include = function(f) return readglsl(pathto,f) end
@@ -19,6 +18,6 @@ local glsl = function(env)
     end
   end
 end
-table.insert(package.loaders, searcher(glsl,_G))
+table.insert(package.loaders, glsl(_G))
 fennel = require("bin.fennel")
 fennel.install().dofile("wrap.fnl")
