@@ -1,4 +1,4 @@
-(fn Object [] `(require :mac.object))
+(fn Object [] `(require :lib.classic))
 
 (fn extends [a b]
   `(local ,(sym (tostring a)) ((. ,b :extend) ,b)))

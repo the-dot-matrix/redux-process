@@ -24,7 +24,7 @@
   (for [k 1 self.K 1]
     (table.insert self.centroids [(love.math.random 0 w)
                                   (love.math.random 0 h)]))
-  (!.super:new w h :src.kmeans.glsl
+  (!.super:new w h :gpu.kmeans.glsl
     {:centroids self.centroids}))
 
 Kmeans

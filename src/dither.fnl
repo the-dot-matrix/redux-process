@@ -4,6 +4,6 @@
 ; TODO replace with macro
 (fn Dither.new [! w h]
   (setmetatable {} !)
-  (!.super:new w h :src.dither.glsl))
+  (!.super:new w h :gpu.dither.glsl))
 
 Dither

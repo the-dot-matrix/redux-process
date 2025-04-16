@@ -20,5 +20,5 @@ local glsl = function(env)
   end
 end
 table.insert(package.loaders, searcher(glsl,_G))
-fennel = require("lib.fennel")
+fennel = require("bin.fennel")
 fennel.install().dofile("wrap.fnl")
