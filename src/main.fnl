@@ -5,7 +5,7 @@
 (local Kmeans (require :src.kmeans))
 
 (fn Main.load [!! w h]
-  (set Main.scale 4)
+  (set (Main.w Main.h Main.scale) (values w h 4))
   (love.graphics.setNewFont (/ 64 Main.scale))
   (let [(sw sh) (values (/ w Main.scale) (/ h Main.scale))]
     (set Main.blank (Blank:new sw sh))
@@ -23,6 +23,9 @@
   (love.graphics.draw Main.kmeans.canvas))
 
 (fn Main.keypressed [key]
-  (when (= key :space) (Main.fbm:update)))
+  (when (= key :space) (do 
+    (Main.fbm:update) 
+    (Main.kmeans:update (/ Main.w Main.scale) 
+                        (/ Main.h Main.scale)))))
 
 Main

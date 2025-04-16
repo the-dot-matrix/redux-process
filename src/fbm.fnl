@@ -2,7 +2,8 @@
 (extends FBM (require :src.screen))
 (new FBM [! w h :gpu.fbm.glsl {
     :scale 0.25 :height 1 :exponentiation 2
-    :octaves 1 :lacunarity 1 :persistence 0}])
+    :octaves 1 :lacunarity 1 :persistence 0}]
+  (!:update))
 
 (fn FBM.update [!]
   (!.super.update ! {

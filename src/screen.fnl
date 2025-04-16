@@ -7,7 +7,9 @@
 
 (fn Screen.update [! sends]
   (when !.shader (each [key value (pairs sends)]
-    (!.shader:send key value))))
+    (if (pcall #(unpack value)) 
+        (!.shader:send key (unpack value))
+        (!.shader:send key value)))))
 
 (fn Screen.draw [! drawable]
   (love.graphics.setCanvas !.canvas)
