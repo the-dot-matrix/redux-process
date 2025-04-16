@@ -5,18 +5,18 @@
   (set !.K 12) ;TODO get K from shader?
   ;TODO send colors to shader, make relationship explicit
   (set !.colors [
-    [0.50  0.00  0.00    0.2]
-    [0.50  0.50  0.00    0.2]
-    [0.00  0.50  0.00    0.2]
-    [0.00  0.50  0.50    0.2]
-    [0.00  0.00  0.50    0.2]
-    [0.50  0.00  0.50    0.2]
-    [0.50  0.30  0.00    0.2]
-    [0.50  0.50  0.30    0.2]
-    [0.00  0.50  0.30    0.2]
-    [0.30  0.50  0.50    0.2]
-    [0.30  0.00  0.50    0.2]
-    [0.50  0.30  0.50    0.2]])
+    [0.50  0.00  0.00    0.5]
+    [0.50  0.50  0.00    0.5]
+    [0.00  0.50  0.00    0.5]
+    [0.00  0.50  0.50    0.5]
+    [0.00  0.00  0.50    0.5]
+    [0.50  0.00  0.50    0.5]
+    [0.50  0.25  0.00    0.5]
+    [0.50  0.50  0.25    0.5]
+    [0.00  0.50  0.25    0.5]
+    [0.25  0.50  0.50    0.5]
+    [0.25  0.00  0.50    0.5]
+    [0.50  0.25  0.50    0.5]])
   (!:update w h))
 
 ; TODO clean-up anti-fenneled code below
@@ -40,10 +40,10 @@
 (fn Kmeans.cluster [! x y r g b a]
   (each [k v (ipairs !.colors)]
     (local color (. !.colors k))
-    (when (and (and (and (< (math.abs (- r (. color 1))) 0.05)
-                         (< (math.abs (- g (. color 2))) 0.05))
-                    (< (math.abs (- b (. color 3))) 0.05))
-               (> a 0))
+    (when (and (and (and  (< (math.abs (- r (. color 1))) 0.05)
+                          (< (math.abs (- g (. color 2))) 0.05))
+                          (< (math.abs (- b (. color 3))) 0.05))
+                          (> a 0))
       (tset (. !.clusters k) :x (+ (. !.clusters k :x) x))
       (tset (. !.clusters k) :y (+ (. !.clusters k :y) y))
       (tset (. !.clusters k) :n (+ (. !.clusters k :n) 1))))
