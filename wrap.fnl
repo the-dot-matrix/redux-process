@@ -25,9 +25,9 @@
     (when love.timer (love.timer.sleep 0.001))))
 
 (fn love.load [args raws]
+  (love.graphics.setNewFont 64)
   (love.graphics.setDefaultFilter :nearest :nearest)
-  (let [(w h) (love.window.getDesktopDimensions)]
-    (love.window.setMode w h {:fullscreen true :vsync false})
+  (let [(x y w h) (love.window.getSafeArea)]
     (set (mode file) (values (require :src.main) :src.main))
     (mode.load load w h)))
 
@@ -36,7 +36,9 @@
 (fn love.draw []
   (love.graphics.clear)
   (let [(w h) (love.graphics.getDimensions)]
+    (love.graphics.push)
     (mode.draw w h))
+    (love.graphics.pop)
     ; TODO move this out of here
     (var newlines "")
     (let [fps   {:fps (love.timer.getFPS)}

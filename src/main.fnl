@@ -6,7 +6,6 @@
 
 (fn Main.load [!! w h]
   (set (Main.w Main.h Main.scale) (values w h 8))
-  (love.graphics.setNewFont (/ 64 Main.scale))
   (let [(sw sh) (values (/ w Main.scale) (/ h Main.scale))]
     (set Main.blank (Blank:new sw sh))
     (set Main.fbm (FBM:new sw sh))
