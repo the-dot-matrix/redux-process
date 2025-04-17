@@ -20,4 +20,6 @@ local glsl = function(env)
 end
 table.insert(package.loaders, glsl(_G))
 fennel = require("bin.fennel")
-fennel.install().dofile("wrap.fnl")
+fennel.install({correlate=true})
+fennel.dofile("trace.fnl")
+fennel.dofile("wrap.fnl")

@@ -1,51 +1,74 @@
-(local Error {})
+(local utfeight (require :utf8))
 
-; TODO cleanup, better traces, deeper embedding of tracebacks
-(fn Error.load [!! oldmode errormessage fnltrace luatrace]
-  (love.graphics.setFont (love.graphics.newFont 32 :mono))
-  (set Error.!! !!)
-  (set Error.oldmode oldmode)
-  (set Error.prettymsg (Error.color-msg errormessage))
-  (set Error.fnltrace "")
-  (set Error.luatrace "")
-  (each [v (fnltrace:gmatch "[^\n]+")]
-    (set Error.fnltrace (.. Error.fnltrace v "\n")))
-  (each [v (luatrace:gmatch "[^\n]+")]
-    (set Error.luatrace (.. Error.luatrace v "\n"))))
+; TODO cleanup anti-fennel-ed default errorhandler
+(fn error-printer [msg layer]
+  (print (: (fennel.traceback (.. "ERROR: " (tostring msg)) (+ 1 (or layer 1)))
+            :gsub "\n[^\n]+$" "")))
 
-(fn Error.draw [w h]
-  (let [m "Press SPACE to reload last known safe state"]
-    (love.graphics.setColor 0.34 0.61 0.86)
-    (love.graphics.rectangle :fill 0 0 w h)
-    (love.graphics.setColor 0.9 0.9 0.9)
-    (love.graphics.printf   m
-                            (math.floor (* h 0.00))
-                            (math.floor (* h 0.02))
-                            w :center)
-    (love.graphics.printf   Error.prettymsg
-                            (math.floor (* h 0.00))
-                            (math.floor (* h 0.08))
-                            w :center)
-    (love.graphics.printf   Error.fnltrace
-                            (math.floor (* h 0.04))
-                            (math.floor (* h 0.16))
-                            w :left)
-    (love.graphics.printf   Error.luatrace
-                            (math.floor (* h -0.04))
-                            (math.floor (* h 0.16))
-                            w :right)))
-
-(fn Error.keypressed [key scancode repeat]
-  (match key :space (Error.!! Error.oldmode)))
-
-(fn Error.color-msg [msg]
-  (if msg
-    (case (msg:match "(.*)\027%[7m(.*)\027%[0m(.*)")
-      (pre selected post)
-      [ [1 1 1] pre
-        [1 0.2 0.2] selected
-        [1 1 1] post]
-      _ msg)
-    ""))
-
-Error
+(fn love.errorhandler [msg]
+  (set-forcibly! msg (tostring msg))
+  (error-printer msg 2)
+  (when (or (or (not love.window) (not love.graphics)) (not love.event))
+    (lua "return "))
+  (when (or (not (love.graphics.isCreated)) (not (love.window.isOpen)))
+    (local (success status) (pcall love.window.setMode 800 600))
+    (when (or (not success) (not status)) (lua "return ")))
+  (when love.mouse (love.mouse.setVisible true) (love.mouse.setGrabbed false)
+    (love.mouse.setRelativeMode false)
+    (when (love.mouse.isCursorSupported) (love.mouse.setCursor)))
+  (when love.joystick
+    (each [i v (ipairs (love.joystick.getJoysticks))]
+      (v:setVibration)))
+  (when love.audio (love.audio.stop))
+  (love.graphics.reset)
+  (local font (love.graphics.setNewFont 14))
+  (love.graphics.setColor 1 1 1)
+  (local trace (fennel.traceback))
+  (love.graphics.origin)
+  (var sanitizedmsg {})
+  (each [char (msg:gmatch utfeight.charpattern)] (table.insert sanitizedmsg char))
+  (set sanitizedmsg (table.concat sanitizedmsg))
+  (local err {})
+  (table.insert err "ERROR\n")
+  (table.insert err sanitizedmsg)
+  (when (not= (length sanitizedmsg) (length msg))
+    (table.insert err "Invalid UTF-8 string in error message."))
+  (table.insert err "\n")
+  (each [l (trace:gmatch "(.-)\n")]
+    (when (not (l:match :boot.lua))
+      (set-forcibly! l (l:gsub "stack traceback:" "Traceback\n"))
+      (table.insert err l)))
+  (var p (table.concat err "\n"))
+  (set p (p:gsub "\t" ""))
+  (set p (p:gsub "%[string \"(.-)\"%]" "%1"))
+  (fn draw []
+    (when (not (love.graphics.isActive)) (lua "return "))
+    (local pos 70)
+    (love.graphics.clear (/ 89 255) (/ 157 255) (/ 220 255))
+    (love.graphics.printf p pos pos (- (love.graphics.getWidth) pos))
+    (love.graphics.present))
+  (local full-error-text p)
+  (fn copy-to-clipboard [] (when (not love.system) (lua "return "))
+    (love.system.setClipboardText full-error-text)
+    (set p (.. p "\nCopied to clipboard!")))
+  (when love.system (set p (.. p "\n\nPress Ctrl+C or tap to copy this error")))
+  (fn []
+    (love.event.pump)
+    (each [e a b c (love.event.poll)]
+      (if (= e :quit) (lua "return 1") (and (= e :keypressed) (= a :escape))
+          (lua "return 1")
+          (and (and (= e :keypressed) (= a :c))
+               (love.keyboard.isDown :lctrl :rctrl))
+          (copy-to-clipboard) (= e :touchpressed)
+          (do
+            (var name (love.window.getTitle))
+            (when (or (= (length name) 0) (= name :Untitled))
+              (set name :Game))
+            (local buttons [:OK :Cancel])
+            (when love.system (tset buttons 3 "Copy to clipboard"))
+            (local pressed
+                   (love.window.showMessageBox (.. "Quit " name "?") "" buttons))
+            (if (= pressed 1) (lua "return 1")
+                (= pressed 3) (copy-to-clipboard)))))
+    (draw)
+    (when love.timer (love.timer.sleep 0.1))))

@@ -36,6 +36,7 @@
     (do (Main.fbm:update)
         (Main.kmeans:update (/ Main.w Main.scale)
                             (/ Main.h Main.scale))
-        (set (Main.drawn? Main.done?) (values false false)))))
+        (set (Main.drawn? Main.done?) (values false false))))
+  (when (= key :rshift) (error (fennel.traceback))))
 
 Main
