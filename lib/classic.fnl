@@ -1,7 +1,10 @@
 (local Object {})
 (set Object.__index Object)
 
-(fn Object.new [!] {})
+;; TODO, is this bad? not really a lib, its fundemental
+(fn Object.new [!]
+  (set (. _G :uuid) (+ 1 (or (. _G :uuid) 0)))
+  {})
 
 (fn Object.extend [!]
   (let [class {}]

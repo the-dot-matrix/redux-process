@@ -1,41 +1,47 @@
-(local Main {})
+(import-macros {: Object : extends : new : update} :mac.class)
+(extends Main (Object))
 (local Blank  (require :src.blank))
 (local FBM    (require :src.fbm))
 (local Dither (require :src.dither))
 (local Kmeans (require :src.kmeans))
 
-(fn Main.load [!! w h]
-  (set (Main.w Main.h Main.scale) (values w h 8))
-  (let [(sw sh) (values (/ w Main.scale) (/ h Main.scale))]
-    (set Main.blank (Blank:new sw sh))
-    (set Main.fbm (FBM:new sw sh))
-    (set Main.dither (Dither:new sw sh))
-    (set Main.kmeans (Kmeans:new sw sh)))
-  (set Main.drawn? false)
-  (set Main.done? false))
+(new Main [! !! w h]
+  (set (!.w !.h !.scale) (values w h 8))
+  (let [(sw sh) (values (/ w !.scale) (/ h !.scale))]
+    (set !.blank (Blank:new sw sh))
+    (set !.fbm (FBM:new sw sh))
+    (set !.dither (Dither:new sw sh))
+    (set !.kmeans (Kmeans:new sw sh)))
+  (set !.drawn? false)
+  (set !.done? false))
 
-(fn Main.update [dt] (when Main.drawn? (Main.kmeans:update)))
+(update Main [! dt] [!.drawn? #(!.kmeans.update !.kmeans)])
 
-(fn Main.draw [w h]
-  (when (not Main.drawn?) ;TODO better pipeline
+(fn Main.draw [! w h]
+  (when (not !.drawn?) ;TODO better pipeline
     (do
-      (Main.blank:draw #(love.graphics.rectangle
-        "fill" 0 0 (/ w Main.scale) (/ h Main.scale)))
-      (Main.fbm:draw #(love.graphics.draw Main.blank.canvas))
-      (Main.dither:draw #(love.graphics.draw Main.fbm.canvas))
-      (set Main.drawn? true)))
-  (when (not Main.done?) (do
-    (Main.kmeans:draw #(love.graphics.draw Main.dither.canvas))
-    (set Main.done? Main.kmeans.converged?)))
-  (love.graphics.scale Main.scale Main.scale)
-  (love.graphics.draw Main.kmeans.canvas))
+      (!.blank:draw #(love.graphics.rectangle
+        "fill" 0 0 (/ w !.scale) (/ h !.scale)))
+      (!.fbm:draw #(love.graphics.draw !.blank.canvas))
+      (!.dither:draw #(love.graphics.draw !.fbm.canvas))
+      (love.event.push :src.main :step !.uuid)))
+  (when (not !.done?) (do
+    (!.kmeans:draw #(love.graphics.draw !.dither.canvas))
+    (love.event.push :src.main :step !.uuid)))
+  (love.graphics.scale !.scale !.scale)
+  (love.graphics.draw !.kmeans.canvas))
 
-(fn Main.keypressed [key] ;TODO better UI
+(fn Main.step [!]
+  (when (not !.drawn?) (set !.drawn? true))
+  (when (and !.drawn? (not !.done?))
+    (set !.done? !.kmeans.converged?)))
+
+(fn Main.keypressed [! key] ;TODO better UI
   (when (= key :space)
-    (do (Main.fbm:update)
-        (Main.kmeans:update (/ Main.w Main.scale)
-                            (/ Main.h Main.scale))
-        (set (Main.drawn? Main.done?) (values false false))))
+    (do (!.fbm:update)
+        (!.kmeans:update (/ !.w !.scale)
+                            (/ !.h !.scale))
+        (set (!.drawn? !.done?) (values false false))))
   (when (= key :rshift) (error (fennel.traceback))))
 
 Main

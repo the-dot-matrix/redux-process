@@ -1,11 +1,10 @@
-local readglsl
-readglsl = function(pathto,file)
+local function readglsl(pathto,file)
   local include = function(f) return readglsl(pathto,f) end
   local contents,_ = love.filesystem.read(pathto..file)
   contents = contents:gsub("#include \"(.-)\"", include)
   return contents
 end
-local glsl = function(env)
+local function glsl(env)
   return function(modname)
     local p = modname:gsub("%.", "/"):gsub("%/glsl", ".glsl")
     if modname:find("glsl") and love.filesystem.getInfo(p) then
