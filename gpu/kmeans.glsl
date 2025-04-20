@@ -1,20 +1,11 @@
 const int K = 12;
-// TODO dynamically generate K different colors (send K to glsl)
-const vec3 colors[K] = vec3[](
-    vec3(1.00,  0.00,  0.00),
-    vec3(1.00,  1.00,  0.00),
-    vec3(0.00,  1.00,  0.00),
-    vec3(0.00,  1.00,  1.00),
-    vec3(0.00,  0.00,  1.00),
-    vec3(1.00,  0.00,  1.00),
-    vec3(1.00,  0.50,  0.00),
-    vec3(1.00,  1.00,  0.50),
-    vec3(0.00,  1.00,  0.50),
-    vec3(0.50,  1.00,  1.00),
-    vec3(0.50,  0.00,  1.00),
-    vec3(1.00,  0.50,  1.00));
 uniform vec2 centroids[K];
 
+vec3 hsv2rgb(vec3 c) {
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
 float distance(vec2 p1, vec2 p2) {
     float a = abs(p1[0]-p2[0]);
     float b = abs(p1[1]-p2[1]);
@@ -32,7 +23,9 @@ vec4 cluster(vec2 p) {
             assignment = k;
         }
     }
-    return vec4(colors[assignment],alpha);
+    float h = ((K/2)-(assignment/2)-((1.0/K)/4))/(K/2);
+    float s = 1.0 / (mod(assignment,2)+1);
+    return vec4(hsv2rgb(vec3(h,s,1)),alpha);
 }
 vec4 effect(vec4 color, Image tex, vec2 txy, vec2 sxy) {
     vec4 src = Texel(tex, txy);
