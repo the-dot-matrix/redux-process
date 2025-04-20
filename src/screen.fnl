@@ -6,7 +6,7 @@
   (when sends (Screen.update ! sends)))
 
 (update Screen [! sends]
-  [!.shader :src.screen :send !.uuid sends])
+  [!.shader #(Screen.send ! sends)])
 
 (fn Screen.draw [! drawable]
   (love.graphics.setCanvas !.canvas)

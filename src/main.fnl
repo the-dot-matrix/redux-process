@@ -18,16 +18,15 @@
 (update Main [! dt] [!.drawn? #(!.kmeans.update !.kmeans)])
 
 (fn Main.draw [! w h]
-  (when (not !.drawn?) ;TODO better pipeline
-    (do
+  (when (not !.drawn?) (do ;TODO better pipeline
       (!.blank:draw #(love.graphics.rectangle
         "fill" 0 0 (/ w !.scale) (/ h !.scale)))
       (!.fbm:draw #(love.graphics.draw !.blank.canvas))
       (!.dither:draw #(love.graphics.draw !.fbm.canvas))
-      (love.event.push :src.main :step !.uuid)))
+      (Main.step !)))
   (when (not !.done?) (do
     (!.kmeans:draw #(love.graphics.draw !.dither.canvas))
-    (love.event.push :src.main :step !.uuid)))
+    (Main.step !)))
   (love.graphics.scale !.scale !.scale)
   (love.graphics.draw !.kmeans.canvas))
 

@@ -23,8 +23,8 @@
 ; TODO imgdata is slow / colors are inaccurate, calc on CPU
 ; FIXME event pushes sanitize metatables... uuids or bust
 (update Kmeans [! w h]
-  [(and w h) :src.kmeans :init !.uuid w h]
-  [(and (not (and w h)) (not !.converged?)) :src.kmeans :iter !.uuid]
+  [(and w h) #(Kmeans.init ! w h)]
+  [(and (not (and w h)) (not !.converged?)) #(Kmeans.iter !)]
   [true #(Kmeans.super.update ! {:centroids !.centroids})])
 
 (fn Kmeans.init [! w h]
