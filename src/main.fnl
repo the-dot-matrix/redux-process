@@ -17,16 +17,16 @@
 
 (update Main [! dt] [!.drawn? #(!.kmeans.update !.kmeans)])
 
-(fn Main.draw [! w h]
+(fn Main.draw [! w h] ;TODO avoid state update in draw call
   (when (not !.drawn?) (do ;TODO better pipeline
       (!.blank:draw #(love.graphics.rectangle
         "fill" 0 0 (/ w !.scale) (/ h !.scale)))
       (!.fbm:draw #(love.graphics.draw !.blank.canvas))
       (!.dither:draw #(love.graphics.draw !.fbm.canvas))
-      (Main.step !)))
+      (!:step)))
   (when (not !.done?) (do
     (!.kmeans:draw #(love.graphics.draw !.dither.canvas))
-    (Main.step !)))
+    (!:step)))
   (love.graphics.scale !.scale !.scale)
   (love.graphics.draw !.kmeans.canvas))
 
@@ -36,11 +36,10 @@
     (set !.done? !.kmeans.converged?)))
 
 (fn Main.keypressed [! key] ;TODO better UI
-  (when (= key :space)
-    (do (!.fbm:update)
-        (!.kmeans:update (/ !.w !.scale)
-                            (/ !.h !.scale))
-        (set (!.drawn? !.done?) (values false false))))
+  (when (= key :space) (do
+    (!.fbm:update)
+    (!.kmeans:update (/ !.w !.scale) (/ !.h !.scale))
+    (set (!.drawn? !.done?) (values false false))))
   (when (= key :rshift) (error (fennel.traceback))))
 
 Main

@@ -3,10 +3,9 @@
 (new Screen [! w h glsl sends]
   (set !.canvas (love.graphics.newCanvas w h))
   (when glsl (set !.shader (require glsl)))
-  (when sends (Screen.update ! sends)))
+  (when sends (Screen.update ! sends))) ;TODO !:update not work?
 
-(update Screen [! sends]
-  [!.shader #(Screen.send ! sends)])
+(update Screen [! sends] [!.shader #(!:send sends)])
 
 (fn Screen.draw [! drawable]
   (love.graphics.setCanvas !.canvas)
@@ -17,9 +16,9 @@
   (love.graphics.setCanvas))
 
 (fn Screen.send [! sends]
-  (when !.shader (each [key value (pairs sends)]
-    (if (pcall #(unpack value))
-        (!.shader:send key (unpack value))
-        (!.shader:send key value)))))
+  (when !.shader (each [k v (pairs sends)]
+    (if (pcall #(unpack v))
+        (!.shader:send k (unpack v))
+        (!.shader:send k v)))))
 
 Screen
