@@ -1,8 +1,9 @@
 (import-macros {: extends : new : update} :mac.class)
 (extends Kmeans (require :src.screen))
 
-;TODO get K from shader?
-(new Kmeans [! w h :gpu.kmeans.glsl] (set !.K 12))
+(new Kmeans [! w h :gpu.kmeans.glsl]
+  (local firstline ((love.filesystem.lines :gpu/kmeans.glsl)))
+  (set !.K (tonumber ((firstline:gmatch "K = (%d+);")))))
 
 (update Kmeans [! canvas]
   [canvas #(!:init canvas)]
@@ -14,10 +15,8 @@
   (local pixels (canvas:newImageData))
   (pixels:mapPixel (partial Kmeans.pixel2point !))
   (set !.centroids {})
-  ;; TODO only rand points?
   (for [k 1 !.K 1] (table.insert !.centroids
-    [ (love.math.random 0 (canvas:getWidth))
-      (love.math.random 0 (canvas:getHeight))]))
+    (. !.points (love.math.random 1 (length !.points)))))
   (set !.converged? false))
 
 (fn Kmeans.pixel2point [! x y r g b a]

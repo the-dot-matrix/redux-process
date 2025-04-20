@@ -1,4 +1,5 @@
 const int K = 12;
+// TODO dynamically generate K different colors (send K to glsl)
 const vec3 colors[K] = vec3[](
     vec3(1.00,  0.00,  0.00),
     vec3(1.00,  1.00,  0.00),
