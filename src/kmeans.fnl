@@ -1,59 +1,56 @@
 (import-macros {: extends : new : update} :mac.class)
 (extends Kmeans (require :src.screen))
 
-(new Kmeans [! w h :gpu.kmeans.glsl]
-  (set !.K 12) ;TODO get K from shader?
-  ;TODO send colors to shader, make relationship explicit
-  (set !.colors [
-    [0.50  0.00  0.00    0.5]
-    [0.50  0.50  0.00    0.5]
-    [0.00  0.50  0.00    0.5]
-    [0.00  0.50  0.50    0.5]
-    [0.00  0.00  0.50    0.5]
-    [0.50  0.00  0.50    0.5]
-    [0.50  0.25  0.00    0.5]
-    [0.50  0.50  0.25    0.5]
-    [0.00  0.50  0.25    0.5]
-    [0.25  0.50  0.50    0.5]
-    [0.25  0.00  0.50    0.5]
-    [0.50  0.25  0.50    0.5]])
-  (!:update w h))
+;TODO get K from shader?
+(new Kmeans [! w h :gpu.kmeans.glsl] (set !.K 12))
 
-; TODO clean-up anti-fenneled code below
-; TODO imgdata is slow / colors are inaccurate, calc on CPU
-; FIXME event pushes sanitize metatables... uuids or bust
-(update Kmeans [! w h]
-  [(and w h) #(!:init w h)]
-  [(and (not (and w h)) (not !.converged?)) #(!:iter)]
+(update Kmeans [! canvas]
+  [canvas #(!:init canvas)]
+  [(and (not canvas) (not !.converged?)) #(!:iter)]
   [true #(!.super.update ! {:centroids !.centroids})])
 
-(fn Kmeans.init [! w h]
+(fn Kmeans.init [! canvas]
+  (set !.points [])
+  (local pixels (canvas:newImageData))
+  (pixels:mapPixel (partial Kmeans.pixel2point !))
   (set !.centroids {})
-  (for [k 1 !.K 1]
-  (table.insert !.centroids [ (love.math.random 0 w)
-                              (love.math.random 0 h)])
-  (set !.converged? false)))
+  ;; TODO only rand points?
+  (for [k 1 !.K 1] (table.insert !.centroids
+    [ (love.math.random 0 (canvas:getWidth))
+      (love.math.random 0 (canvas:getHeight))]))
+  (set !.converged? false))
 
-(fn Kmeans.iter [!]
-  (local imgdata (!.canvas:newImageData))
-  (set !.clusters {})
-  (for [k 1 !.K] (table.insert !.clusters {:x 0 :y 0 :n 0}))
-  (imgdata:mapPixel (partial Kmeans.cluster !))
-  (!:centroid imgdata))
-
-(fn Kmeans.cluster [! x y r g b a]
-  (each [k v (ipairs !.colors)]
-    (local color (. !.colors k))
-    (when (and (and (and  (< (math.abs (- r (. color 1))) 0.05)
-                          (< (math.abs (- g (. color 2))) 0.05))
-                          (< (math.abs (- b (. color 3))) 0.05))
-                          (> a 0))
-      (tset (. !.clusters k) :x (+ (. !.clusters k :x) x))
-      (tset (. !.clusters k) :y (+ (. !.clusters k :y) y))
-      (tset (. !.clusters k) :n (+ (. !.clusters k :n) 1))))
+(fn Kmeans.pixel2point [! x y r g b a]
+  (when (= (+ r b g a) 4) (table.insert !.points [x y]))
   (values r g b a))
 
-(fn Kmeans.centroid [! imgdata]
+(fn Kmeans.iter [!]
+  (set !.clusters {})
+  (for [k 1 !.K] (table.insert !.clusters {:x 0 :y 0 :n 0}))
+  (for [i 1 (length !.points)]
+    (local p (. !.points i))
+    (local k (!:cluster p))
+    (set (. !.clusters k :x) (+ (. !.clusters k :x) (. p 1)))
+    (set (. !.clusters k :y) (+ (. !.clusters k :y) (. p 2)))
+    (set (. !.clusters k :n) (+ (. !.clusters k :n) 1)))
+  (!:centroid))
+
+(fn Kmeans.cluster [! p]
+  (var mindist nil)
+  (var cluster nil)
+  (for [k 1 !.K]
+    (local dist (!:distance p (. !.centroids k)))
+    (when (or (not mindist) (< dist mindist)) (do
+      (set mindist dist)
+      (set cluster k))))
+  cluster)
+
+(fn Kmeans.distance [! p1 p2]
+  (local a (math.abs (- (. p1 1) (. p2 1))))
+  (local b (math.abs (- (. p1 2) (. p2 2))))
+  (math.sqrt (+ (math.pow a 2) (math.pow b 2))))
+
+(fn Kmeans.centroid [!]
   (var changed? false)
   (for [k 1 !.K]
     (local x (/ (. !.clusters k :x) (. !.clusters k :n)))
