@@ -1,5 +1,6 @@
-(import-macros {: Object : extends : new : update} :mac.class)
+(require-macros :mac.class)
 (extends Screen (Object))
+
 (new Screen [! w h glsl sends]
   (set !.canvas (love.graphics.newCanvas w h))
   (when glsl (set !.shader (require glsl)))
@@ -7,18 +8,19 @@
 
 (update Screen [! dt] [(and !.shader !.sends) #(!:send)])
 
-(fn Screen.draw [! drawable]
-  (love.graphics.setCanvas !.canvas)
-  (love.graphics.clear 0 0 0 1)
-  (when !.shader (love.graphics.setShader !.shader))
-  (drawable)
-  (love.graphics.setShader)
-  (love.graphics.setCanvas))
+(draw Screen [! drawable]
+  [true #(love.graphics.setCanvas !.canvas)]
+  [true #(love.graphics.clear 0 0 0 1)]
+  [!.shader #(love.graphics.setShader !.shader)]
+  [drawable #(love.graphics.draw drawable)]
+  [(not drawable) #(love.graphics.clear 1 1 1 1)]
+  [true #(love.graphics.setShader)]
+  [true #(love.graphics.setCanvas)])
 
 (fn Screen.send [!]
   (each [k v (pairs !.sends)]
     (if (pcall #(unpack v))
-        (!.shader:send k (unpack v))
+        (when (unpack v) (!.shader:send k (unpack v)))
         (!.shader:send k v))))
 
 Screen

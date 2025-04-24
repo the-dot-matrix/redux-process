@@ -1,4 +1,4 @@
-(import-macros {: Object : extends : new : update} :mac.class)
+(require-macros :mac.class)
 (extends Main (Object))
 (local Blank  (require :src.blank))
 (local FBM    (require :src.fbm))
@@ -14,32 +14,22 @@
   (set !.kmeans (Kmeans:new !.w !.h !.dither.canvas)))
 
 (update Main [! dt]
-  [(and !.drawn? (not !.iter?)) #(!.kmeans:update)]
-  [(and !.iter? (not !.done?)) #(!.kmeans:update)])
+  [(not !.done?) #(set !.done? (!.kmeans:update))])
 
-(fn Main.draw [!] ;TODO better pipeline
-  (when (not !.drawn?) (do
-    (!.blank:draw #(love.graphics.rectangle :fill 0 0 !.w !.h))
-    (!.fbm:draw #(love.graphics.draw !.blank.canvas))
-    (!.dither:draw #(love.graphics.draw !.fbm.canvas))))
-  (when (not !.done?) (do
-    (!.kmeans:draw #(love.graphics.draw !.dither.canvas))))
-  (love.graphics.scale !.scale !.scale)
-  (love.graphics.draw !.kmeans.canvas)
-  (!:step)) ;TODO avoid state update in draw call
-
-(fn Main.step [!]
-  (when (and !.iter? (not !.done?))
-    (set !.done? !.kmeans.converged?))
-  (when (and !.drawn? (not !.iter?)) (set !.iter? true))
-  (when (not !.drawn?) (set !.drawn? true)))
+; TODO redraws back, who should handle? draw call optimization
+(draw Main [!]
+  [true #(!.blank:draw)]
+  [true #(!.fbm:draw !.blank.canvas)]
+  [true #(!.dither:draw !.fbm.canvas)]
+  [true #(!.kmeans:draw !.dither.canvas)]
+  [true #(love.graphics.scale !.scale !.scale)]
+  [true #(love.graphics.draw !.kmeans.canvas)])
 
 (fn Main.keypressed [! key] ;TODO better UI
   (when (= key :space) (do
     (!.fbm:update)
     (set !.kmeans (Kmeans:new !.w !.h !.dither.canvas))
-    (set (!.drawn? !.iter? !.done?)
-      (values false false false))))
+    (set !.done? false)))
   (when (= key :rshift) (error (fennel.traceback))))
 
 Main

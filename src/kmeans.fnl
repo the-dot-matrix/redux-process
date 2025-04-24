@@ -12,7 +12,8 @@
   [(= (length !.centroids) 0) #(!:init)]
   [(not !.converged?) #(!:iter)]
   [true #(set !.super.sends {:centroids !.centroids})]
-  [true #(!.super.update ! dt)])
+  [true #(!.super.update ! dt)]
+  [true (hashfn !.converged?)])
 
 (fn Kmeans.init [!]
   (local pixels (!.input:newImageData))
@@ -39,7 +40,7 @@
 (fn Kmeans.cluster [! p]
   (var mindist nil)
   (var cluster nil)
-  (for [k 1 !.K]
+  (for [k 1 (length !.centroids)]
     (local dist (!:distance p (. !.centroids k)))
     (when (or (not mindist) (< dist mindist)) (do
       (set mindist dist)
@@ -52,8 +53,8 @@
   (math.sqrt (+ (math.pow a 2) (math.pow b 2))))
 
 (fn Kmeans.centroid [!]
-  (var changed? false)
-  (for [k 1 !.K]
+  (var changed? (= (length !.centroids) 0))
+  (for [k 1 (length !.centroids)]
     (local x (/ (. !.clusters k :x) (. !.clusters k :n)))
     (local y (/ (. !.clusters k :y) (. !.clusters k :n)))
     (local recentroid [(math.floor x) (math.floor y)])

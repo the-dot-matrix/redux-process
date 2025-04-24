@@ -1,5 +1,4 @@
 (local exit? #(and (= $1 :keypressed) (= $2 :escape)))
-(tset _G :uuids [])
 (var (dt file mode) (values 0 nil nil))
 
 (fn love.run []
