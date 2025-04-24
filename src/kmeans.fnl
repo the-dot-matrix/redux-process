@@ -2,8 +2,8 @@
 (extends Kmeans (require :src.screen))
 
 (new Kmeans [! w h :gpu.kmeans.glsl false input]
-  (local firstline ((love.filesystem.lines :gpu/kmeans.glsl)))
-  (set !.K (tonumber ((firstline:gmatch "K = (%d+);"))))
+  (let [firstline ((love.filesystem.lines :gpu/kmeans.glsl))]
+    (set !.K (tonumber ((firstline:gmatch "K = (%d+);")))))
   (set !.input input)
   (set !.points [])
   (set !.centroids {}))
@@ -16,8 +16,8 @@
   [true (hashfn !.converged?)])
 
 (fn Kmeans.init [!]
-  (local pixels (!.input:newImageData))
-  (pixels:mapPixel (partial Kmeans.pixel2point !))
+  (let [pixels (!.input:newImageData)]
+    (pixels:mapPixel (partial Kmeans.pixel2point !)))
   (for [k 1 !.K 1] (table.insert !.centroids
     (. !.points (love.math.random 1 (length !.points)))))
   (set !.converged? false))
@@ -30,38 +30,35 @@
   (set !.clusters {})
   (for [k 1 !.K] (table.insert !.clusters {:x 0 :y 0 :n 0}))
   (for [i 1 (length !.points)]
-    (local p (. !.points i))
-    (local k (!:cluster p))
-    (set (. !.clusters k :x) (+ (. !.clusters k :x) (. p 1)))
-    (set (. !.clusters k :y) (+ (. !.clusters k :y) (. p 2)))
-    (set (. !.clusters k :n) (+ (. !.clusters k :n) 1)))
+    (let [p (. !.points i) k (!:cluster p)]
+      (set (. !.clusters k) { :x (+ (. !.clusters k :x) (. p 1))
+                              :y (+ (. !.clusters k :y) (. p 2))
+                              :n (+ (. !.clusters k :n) 1)})))
   (!:centroid))
 
 (fn Kmeans.cluster [! p]
-  (var mindist nil)
-  (var cluster nil)
+  (var (mindist cluster) (values nil nil))
   (for [k 1 (length !.centroids)]
-    (local dist (!:distance p (. !.centroids k)))
-    (when (or (not mindist) (< dist mindist)) (do
-      (set mindist dist)
-      (set cluster k))))
+    (let [dist (!:distance p (. !.centroids k))]
+      (when (or (not mindist) (< dist mindist))
+        (do (set mindist dist) (set cluster k)))))
   cluster)
 
 (fn Kmeans.distance [! p1 p2]
-  (local a (math.abs (- (. p1 1) (. p2 1))))
-  (local b (math.abs (- (. p1 2) (. p2 2))))
-  (math.sqrt (+ (math.pow a 2) (math.pow b 2))))
+  (let [a (math.abs (- (. p1 1) (. p2 1)))
+        b (math.abs (- (. p1 2) (. p2 2)))]
+    (math.sqrt (+ (math.pow a 2) (math.pow b 2)))))
 
 (fn Kmeans.centroid [!]
   (var changed? (= (length !.centroids) 0))
   (for [k 1 (length !.centroids)]
-    (local x (/ (. !.clusters k :x) (. !.clusters k :n)))
-    (local y (/ (. !.clusters k :y) (. !.clusters k :n)))
-    (local recentroid [(math.floor x) (math.floor y)])
-    (set changed? (or changed?
-      (or (not= (. !.centroids k 1) (. recentroid 1))
-          (not= (. !.centroids k 2) (. recentroid 2)))))
-    (tset !.centroids k recentroid))
+    (let [x (/ (. !.clusters k :x) (. !.clusters k :n))
+          y (/ (. !.clusters k :y) (. !.clusters k :n))
+          recentroid [(math.floor x) (math.floor y)]
+          xchange (not= (. !.centroids k 1) (. recentroid 1))
+          ychange (not= (. !.centroids k 2) (. recentroid 2))]
+      (set changed? (or changed? xchange ychange))
+      (tset !.centroids k recentroid)))
   (set !.converged? (not changed?)))
 
 Kmeans
