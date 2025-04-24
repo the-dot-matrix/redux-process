@@ -36,20 +36,19 @@
 
 (fn love.draw []
   (love.graphics.clear)
-  (let [(w h) (love.graphics.getDimensions)]
-    (love.graphics.push)
-    (mode:draw w h))
-    (love.graphics.pop)
-    ; TODO move this out of here
-    (var newlines "")
-    (let [fps   {:fps (love.timer.getFPS)}
-          infos [(love.graphics.getRendererInfo)]
-          info  (accumulate [c "" i v (ipairs infos)] (.. c v))
-          name  {:name (. infos 1)}
-          vers  {:version (. infos 2)}
-          vend  {:vendor (. infos 3)}
-          dev   {:device (. infos 4)}
-          views [info fps]]
-      (each [i v (ipairs views)]
-        (love.graphics.print (.. newlines (fennel.view v)))
-        (set newlines (.. newlines "\n")))))
+  (love.graphics.push)
+  (mode:draw)
+  (love.graphics.pop)
+  ; TODO move this out of here
+  (var newlines "")
+  (let [fps   {:fps (love.timer.getFPS)}
+        infos [(love.graphics.getRendererInfo)]
+        info  (accumulate [c "" i v (ipairs infos)] (.. c v))
+        name  {:name (. infos 1)}
+        vers  {:version (. infos 2)}
+        vend  {:vendor (. infos 3)}
+        dev   {:device (. infos 4)}
+        views [info fps]]
+    (each [i v (ipairs views)]
+      (love.graphics.print (.. newlines (fennel.view v)))
+      (set newlines (.. newlines "\n")))))

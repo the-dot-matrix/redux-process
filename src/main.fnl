@@ -17,12 +17,11 @@
   [(and !.drawn? (not !.iter?)) #(!.kmeans:update)]
   [(and !.iter? (not !.done?)) #(!.kmeans:update)])
 
-(fn Main.draw [! w h] ;TODO better pipeline
+(fn Main.draw [!] ;TODO better pipeline
   (when (not !.drawn?) (do
-      (!.blank:draw #(love.graphics.rectangle
-        "fill" 0 0 (/ w !.scale) (/ h !.scale)))
-      (!.fbm:draw #(love.graphics.draw !.blank.canvas))
-      (!.dither:draw #(love.graphics.draw !.fbm.canvas))))
+    (!.blank:draw #(love.graphics.rectangle :fill 0 0 !.w !.h))
+    (!.fbm:draw #(love.graphics.draw !.blank.canvas))
+    (!.dither:draw #(love.graphics.draw !.fbm.canvas))))
   (when (not !.done?) (do
     (!.kmeans:draw #(love.graphics.draw !.dither.canvas))))
   (love.graphics.scale !.scale !.scale)
