@@ -3,8 +3,7 @@
 (new Screen [! w h glsl sends]
   (set !.canvas (love.graphics.newCanvas w h))
   (when glsl (set !.shader (require glsl)))
-  (when sends (do (set !.sends sends) (Screen.update !))))
-;TODO !:update not work?
+  (when sends (do (set !.sends sends) (!:update))))
 
 (update Screen [! dt] [(and !.shader !.sends) #(!:send)])
 
