@@ -9,7 +9,8 @@ loveurl = $(lovegit)$(loveversion)/
 lovefile = love-$(loveversion)-x86_64.AppImage
 love = bin/love
 path = /usr/bin/love
-default:
+default: install
+	love .
 
 $(fennel):
 	wget $(fennelurl)$(fennelfile)

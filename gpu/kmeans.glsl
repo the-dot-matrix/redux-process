@@ -24,7 +24,7 @@ vec4 cluster(vec2 p) {
         }
     }
     float h = ((K/2)-(assignment/2)-((1.0/K)/4))/(K/2);
-    float s = 1.0 / (mod(assignment,2)+1);
+    float s = 1.0 / (mod(assignment,2)*2+1);
     return vec4(hsv2rgb(vec3(h,s,1)),alpha);
 }
 vec4 effect(vec4 color, Image tex, vec2 txy, vec2 sxy) {
