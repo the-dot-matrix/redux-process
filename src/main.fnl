@@ -6,18 +6,15 @@
 (local Kmeans (require :src.kmeans))
 
 (new Main [! !! w h]
-  (set (!.w !.h !.scale) (values w h 4))
-  (let [(sw sh) (values (/ !.w !.scale) (/ !.h !.scale))]
-    (set !.blank (Blank:new sw sh))
-    (set !.fbm (FBM:new sw sh))
-    (set !.dither (Dither:new sw sh))
-    (set !.kmeans (Kmeans:new sw sh)))
-  (set !.drawn? false)
-  (set !.done? false))
+  (set !.scale 4)
+  (set (!.w !.h) (values (/ w !.scale) (/ h !.scale)))
+  (set !.blank (Blank:new !.w !.h))
+  (set !.fbm (FBM:new !.w !.h))
+  (set !.dither (Dither:new !.w !.h))
+  (set !.kmeans (Kmeans:new !.w !.h !.dither.canvas)))
 
 (update Main [! dt]
-  [(and !.drawn? (not !.iter?))
-    #(!.kmeans:update !.dither.canvas)]
+  [(and !.drawn? (not !.iter?)) #(!.kmeans:update)]
   [(and !.iter? (not !.done?)) #(!.kmeans:update)])
 
 (fn Main.draw [! w h] ;TODO better pipeline
@@ -41,6 +38,7 @@
 (fn Main.keypressed [! key] ;TODO better UI
   (when (= key :space) (do
     (!.fbm:update)
+    (set !.kmeans (Kmeans:new !.w !.h !.dither.canvas))
     (set (!.drawn? !.iter? !.done?)
       (values false false false))))
   (when (= key :rshift) (error (fennel.traceback))))

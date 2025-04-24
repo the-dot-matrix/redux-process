@@ -5,8 +5,11 @@
     :octaves 1 :lacunarity 1 :persistence 0}]
   (!:update))
 
-(update FBM [!] [true #(!.super.update ! {
-  :offsetx (love.math.random -55555 55555)
-  :offsety (love.math.random -55555 55555)})])
+(update FBM [! dt] [true #(!:random)])
+
+(fn FBM.random [!]
+  (set !.sends.offsetx (love.math.random -55555 55555))
+  (set !.sends.offsety (love.math.random -55555 55555))
+  (!.super.update !))
 
 FBM

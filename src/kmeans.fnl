@@ -1,20 +1,22 @@
 (import-macros {: extends : new : update} :mac.class)
 (extends Kmeans (require :src.screen))
 
-(new Kmeans [! w h :gpu.kmeans.glsl]
+(new Kmeans [! w h :gpu.kmeans.glsl false input]
   (local firstline ((love.filesystem.lines :gpu/kmeans.glsl)))
-  (set !.K (tonumber ((firstline:gmatch "K = (%d+);")))))
-
-(update Kmeans [! canvas]
-  [canvas #(!:init canvas)]
-  [(and (not canvas) (not !.converged?)) #(!:iter)]
-  [true #(!.super.update ! {:centroids !.centroids})])
-
-(fn Kmeans.init [! canvas]
+  (set !.K (tonumber ((firstline:gmatch "K = (%d+);"))))
+  (set !.input input)
   (set !.points [])
-  (local pixels (canvas:newImageData))
+  (set !.centroids {}))
+
+(update Kmeans [! dt]
+  [(= (length !.centroids) 0) #(!:init)]
+  [(not !.converged?) #(!:iter)]
+  [true #(set !.super.sends {:centroids !.centroids})]
+  [true #(!.super.update ! dt)])
+
+(fn Kmeans.init [!]
+  (local pixels (!.input:newImageData))
   (pixels:mapPixel (partial Kmeans.pixel2point !))
-  (set !.centroids {})
   (for [k 1 !.K 1] (table.insert !.centroids
     (. !.points (love.math.random 1 (length !.points)))))
   (set !.converged? false))
