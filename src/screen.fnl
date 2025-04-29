@@ -1,4 +1,5 @@
-(require-macros :mac.class)
+(import-macros {: Object : extends : new} :λ.class)
+(import-macros {: update : draw} :λ.aGUI)
 (extends Screen (Object))
 
 (new Screen [! w h glsl sends]

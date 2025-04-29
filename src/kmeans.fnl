@@ -1,8 +1,9 @@
-(import-macros {: extends : new : update} :mac.class)
+(import-macros {: extends : new} :λ.class)
+(import-macros {: update} :λ.aGUI)
 (extends Kmeans (require :src.screen))
 
-(new Kmeans [! w h :gpu.kmeans.glsl false input]
-  (let [firstline ((love.filesystem.lines :gpu/kmeans.glsl))]
+(new Kmeans [! w h :src.kmeans.glsl false input]
+  (let [firstline ((love.filesystem.lines :src/kmeans.glsl))]
     (set !.K (tonumber ((firstline:gmatch "K = (%d+);")))))
   (set !.input input)
   (set !.points [])

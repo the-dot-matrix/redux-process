@@ -1,4 +1,5 @@
-(require-macros :mac.class)
+(import-macros {: Object : extends : new} :λ.class)
+(import-macros {: update : draw} :λ.aGUI)
 (extends Main (Object))
 (local Blank  (require :src.blank))
 (local FBM    (require :src.fbm))
