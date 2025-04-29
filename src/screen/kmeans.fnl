@@ -2,12 +2,11 @@
 (import-macros {: update} :λ.aGUI)
 (extends Kmeans (require :src.screen))
 
-(new Kmeans [! w h :src.kmeans.glsl false input]
-  (let [firstline ((love.filesystem.lines :src/kmeans.glsl))]
+(new Kmeans [! w h :src.shader.kmeans.glsl false input]
+  (let [shaderfile :src/shader/kmeans.glsl
+        firstline ((love.filesystem.lines shaderfile))]
     (set !.K (tonumber ((firstline:gmatch "K = (%d+);")))))
-  (set !.input input)
-  (set !.points [])
-  (set !.centroids {}))
+  (set (!.input !.points !.centroids) (values input [] {})))
 
 (update Kmeans [! dt]
   [(= (length !.centroids) 0) #(!:init)]

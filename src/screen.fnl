@@ -19,9 +19,10 @@
   [true #(love.graphics.setCanvas)])
 
 (fn Screen.send [!]
-  (each [k v (pairs !.sends)]
-    (if (pcall #(unpack v))
-        (when (unpack v) (!.shader:send k (unpack v)))
-        (!.shader:send k v))))
+  (when !.shader
+    (each [k v (pairs !.sends)]
+      (if (pcall #(unpack v))
+          (when (unpack v) (!.shader:send k (unpack v)))
+          (!.shader:send k v)))))
 
 Screen

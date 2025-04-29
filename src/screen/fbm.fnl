@@ -1,7 +1,7 @@
 (import-macros {: extends : new} :λ.class)
 (import-macros {: update} :λ.aGUI)
 (extends FBM (require :src.screen))
-(new FBM [! w h :src.fbm.glsl {
+(new FBM [! w h :src.shader.fbm.glsl {
     :scale 0.25 :height 1 :exponentiation 2
     :octaves 1 :lacunarity 1 :persistence 0}]
   (!:update))

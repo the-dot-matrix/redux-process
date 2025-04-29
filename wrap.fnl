@@ -1,3 +1,4 @@
+(local entry :src.noisecluster)
 (local exit? #(and (= $1 :keypressed) (= $2 :escape)))
 (var (dt file mode) (values 0 nil nil))
 
@@ -28,7 +29,7 @@
   (love.graphics.setDefaultFilter :nearest :nearest)
   (let [(x y w h) (love.window.getSafeArea)
         load      #(set (mode file) (values (require $1) $1))]
-    (load :src.main)
+    (load entry)
     (set mode (mode:new load w h))))
 
 (fn love.update [dt] (mode:update dt))
