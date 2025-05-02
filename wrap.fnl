@@ -1,4 +1,4 @@
-(local entry :src.noisecluster)
+(local entry :src.difflimagg)
 (local exit? #(and (= $1 :keypressed) (= $2 :escape)))
 (var (dt file mode) (values 0 nil nil))
 

@@ -3,6 +3,7 @@
 (extends Screen (Object))
 
 (new Screen [! w h glsl sends]
+  (set (!.w !.h) (values w h))
   (set !.canvas (love.graphics.newCanvas w h))
   (when glsl (set !.shader (require glsl)))
   (when sends (do (set !.sends sends) (!:update))))
@@ -14,7 +15,7 @@
   [true #(love.graphics.clear 0 0 0 1)]
   [!.shader #(love.graphics.setShader !.shader)]
   [drawable #(love.graphics.draw drawable)]
-  [(not drawable) #(love.graphics.clear 1 1 1 1)]
+  [(not drawable) #(love.graphics.rectangle :fill 0 0 !.w !.h)]
   [true #(love.graphics.setShader)]
   [true #(love.graphics.setCanvas)])
 
