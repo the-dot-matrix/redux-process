@@ -10,12 +10,13 @@
 
 (update Screen [! dt] [(and !.shader !.sends) #(!:send)])
 
-(draw Screen [! drawable]
+(draw Screen [! todraw keep?]
   [true #(love.graphics.setCanvas !.canvas)]
-  [true #(love.graphics.clear 0 0 0 1)]
+  [(not keep?) #(love.graphics.clear 0 0 0 1)]
   [!.shader #(love.graphics.setShader !.shader)]
-  [drawable #(love.graphics.draw drawable)]
-  [(not drawable) #(love.graphics.rectangle :fill 0 0 !.w !.h)]
+  [(= (type todraw) :userdata) #(love.graphics.draw todraw)]
+  [(= (type todraw) :function) #(todraw)]
+  [(not todraw) #(love.graphics.rectangle :fill 0 0 !.w !.h)]
   [true #(love.graphics.setShader)]
   [true #(love.graphics.setCanvas)])
 
