@@ -1,10 +1,10 @@
-(import-macros {: Object : extends : new} :λ.class)
-(import-macros {: update : draw} :λ.aGUI)
+(import-macros {: Object : extends : new} :syntax.class)
+(import-macros {: update : draw} :syntax.aGUI)
 (extends NoiseCluster (Object))
-(local Blank  (require :src.screen.blank))
-(local FBM    (require :src.screen.fbm))
-(local Dither (require :src.screen.dither))
-(local Kmeans (require :src.screen.kmeans))
+(local Blank  (require :source.screen.blank))
+(local FBM    (require :source.screen.fbm))
+(local Dither (require :source.screen.dither))
+(local Kmeans (require :source.screen.kmeans))
 
 (new NoiseCluster [! !! w h]
   (set !.scale 4)

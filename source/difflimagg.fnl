@@ -1,8 +1,8 @@
-(import-macros {: Object : extends : new} :λ.class)
-(import-macros {: update : draw} :λ.aGUI)
+(import-macros {: Object : extends : new} :syntax.class)
+(import-macros {: update : draw} :syntax.aGUI)
 (extends DiffusionLimitedAggregation (Object))
-(local Grid (require :src.screen.grid))
-(local DLA (require :src.screen.dla))
+(local Grid (require :source.screen.grid))
+(local DLA (require :source.screen.dla))
 
 (new DiffusionLimitedAggregation [! !! w h]
   (set !.tilepx 32)

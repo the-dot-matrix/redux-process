@@ -1,4 +1,4 @@
-(fn Object [] `(require :λ.object))
+(fn Object [] `(require :syntax.object))
 
 (fn extends [a b]
   `(local ,(sym (tostring a)) ((. ,b :extend) ,b)))

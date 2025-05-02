@@ -1,5 +1,5 @@
-(import-macros {: Object : extends : new} :λ.class)
-(import-macros {: update : draw} :λ.aGUI)
+(import-macros {: Object : extends : new} :syntax.class)
+(import-macros {: update : draw} :syntax.aGUI)
 (extends Screen (Object))
 
 (new Screen [! w h glsl sends]

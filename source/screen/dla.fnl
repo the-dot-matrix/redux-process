@@ -1,6 +1,6 @@
-(import-macros {: extends : new} :λ.class)
-(import-macros {: update : draw} :λ.aGUI)
-(extends DLA (require :src.screen))
+(import-macros {: extends : new} :syntax.class)
+(import-macros {: update : draw} :syntax.aGUI)
+(extends DLA (require :source.screen))
 (new DLA [! w h false false cellpx]
   (set !.cellpx cellpx)
   (set !.first? true))
